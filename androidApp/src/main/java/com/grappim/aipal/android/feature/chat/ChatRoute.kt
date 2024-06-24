@@ -4,14 +4,18 @@ import android.Manifest
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -19,8 +23,10 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -61,6 +67,7 @@ fun ChatRoute(
     val coroutineScope = rememberCoroutineScope()
     val keyboard = LocalSoftwareKeyboardController.current
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
+    val listState = rememberLazyListState()
 
     if (!permissionState.status.isGranted) {
         LaunchedEffect(true) {
@@ -70,7 +77,17 @@ fun ChatRoute(
 
     LaunchedEffect(state.assistantMessage) {
         if (state.assistantMessage.isNotEmpty()) {
-            textToSpeech?.say(state.assistantMessage)
+            runCatching {
+                textToSpeech?.stop()
+                textToSpeech?.say(state.assistantMessage)
+            }
+        }
+    }
+    LaunchedEffect(state.listMessages) {
+        if (state.listMessages.isNotEmpty()) {
+            coroutineScope.launch {
+                listState.animateScrollToItem(index = state.listMessages.lastIndex)
+            }
         }
     }
 
@@ -110,18 +127,24 @@ fun ChatRoute(
                 Modifier
                     .padding(paddingValues)
                     .fillMaxWidth(),
-            reverseLayout = false,
+            state = listState,
         ) {
             items(state.getMessagesForUi()) { item ->
                 ChatItem(
                     message = item,
                     onRepeat = {
                         coroutineScope.launch {
-                            textToSpeech?.say(it)
+                            runCatching {
+                                textToSpeech?.stop()
+                                textToSpeech?.say(it)
+                            }
                         }
                     },
                     onMessageCopy = { text ->
                         clipboardManager.setText(AnnotatedString(text))
+                    },
+                    onTranslate = { chatMessage ->
+                        viewModel.translateMessage(chatMessage)
                     },
                 )
             }
@@ -134,6 +157,7 @@ private fun ChatItem(
     message: ChatMessageUI,
     onRepeat: (String) -> Unit,
     onMessageCopy: (String) -> Unit,
+    onTranslate: (ChatMessageUI) -> Unit,
 ) {
     Row(
         modifier =
@@ -150,6 +174,9 @@ private fun ChatItem(
             IconButton(onClick = { onMessageCopy(message.message) }) {
                 Icon(imageVector = Icons.Filled.ContentCopy, contentDescription = "")
             }
+            IconButton(onClick = { onTranslate(message) }) {
+                Icon(imageVector = Icons.Filled.Translate, contentDescription = "")
+            }
         }
         Box(
             modifier =
@@ -164,7 +191,16 @@ private fun ChatItem(
                     ).background(Color(0xFFCCC2DC))
                     .padding(16.dp),
         ) {
-            Text(text = message.message)
+            Column {
+                Text(text = message.message)
+
+                if (message.translation.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    HorizontalDivider(color = Color.Blue, thickness = 1.dp)
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(text = message.translation)
+                }
+            }
         }
         if (message.isUserMessage) {
             IconButton(onClick = { onMessageCopy(message.message) }) {

@@ -2,7 +2,10 @@ package com.grappim.aipal.android.root
 
 import android.app.Application
 import android.content.Context
+import com.grappim.aipal.android.BuildConfig
+import com.grappim.aipal.android.core.dataStoreModule
 import com.grappim.aipal.android.core.jsonModule
+import com.grappim.aipal.android.data.local.LocalDataStorage
 import com.grappim.aipal.android.data.repo.AiPalRepo
 import com.grappim.aipal.android.data.repo.AiPalRepoImpl
 import com.grappim.aipal.android.data.service.OpenAiClient
@@ -21,14 +24,17 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
+import org.lighthousegames.logging.KmLogging
+import org.lighthousegames.logging.LogLevel
 
 class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
+        KmLogging.setLogLevel(if (BuildConfig.DEBUG) LogLevel.Verbose else LogLevel.Off)
         val appModules =
             module {
                 single<OpenAiClient> { OpenAiClientImpl() }
-                single<AiPalRepo> { AiPalRepoImpl(get<OpenAiClient>()) }
+                single<AiPalRepo> { AiPalRepoImpl(get<OpenAiClient>(), get<LocalDataStorage>()) }
                 viewModel {
                     ChatViewModel(
                         get<AiPalRepo>(),
@@ -38,7 +44,8 @@ class MainApplication : Application() {
                 }
                 viewModel {
                     SettingsViewModel(
-                        get<AiPalRepo>()
+                        get<AiPalRepo>(),
+                        get<LocalDataStorage>(),
                     )
                 }
                 single<RecognitionManager> { RecognitionManagerImpl(get<RecognitionMessageDecoder>()) }
@@ -49,7 +56,7 @@ class MainApplication : Application() {
         startKoin {
             androidLogger()
             androidContext(this@MainApplication)
-            modules(appModules, jsonModule)
+            modules(appModules, jsonModule, dataStoreModule)
         }
     }
 }

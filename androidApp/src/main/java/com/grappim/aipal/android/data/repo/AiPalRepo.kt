@@ -5,23 +5,16 @@ import com.aallam.openai.api.chat.ChatMessage
 import com.aallam.openai.api.core.Role
 import com.aallam.openai.api.model.Model
 import com.aallam.openai.api.model.ModelId
+import com.grappim.aipal.android.core.DEFAULT_BEHAVIOR
+import com.grappim.aipal.android.data.local.LocalDataStorage
 import com.grappim.aipal.android.data.model.Message
-import com.grappim.aipal.android.data.model.ModelToUse
 import com.grappim.aipal.android.data.service.OpenAiClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-
-const val DEFAULT_MODEL = "gpt-3.5-turbo"
-const val DEFAULT_BEHAVIOR =
-    "You are my German friend with whom I want to practice German. " +
-        "When I finish this conversation, " +
-        "show me my errors and provide ways to fix them."
 
 interface AiPalRepo {
     val resultMessage: StateFlow<String>
@@ -32,29 +25,50 @@ interface AiPalRepo {
 
     fun setBehavior(msg: String)
 
-    fun setModel(model: String)
+    suspend fun translateMessage(msg: String): String
 }
 
 class AiPalRepoImpl(
     private val openAiClient: OpenAiClient,
+    private val localDataStorage: LocalDataStorage,
 ) : AiPalRepo {
     override val resultMessage = MutableStateFlow("")
 
     private val messages = mutableListOf<Message>()
 
-    private val mutex = Mutex()
-    private var _currentModelToUse = ModelToUse(DEFAULT_MODEL)
-    private var currentModelToUse: ModelToUse
-        get() = runBlocking { mutex.withLock { _currentModelToUse } }
-        set(newValue) = runBlocking { mutex.withLock { _currentModelToUse = newValue } }
-
     init {
         setBehavior(DEFAULT_BEHAVIOR)
     }
 
-    override fun setModel(model: String) {
-        currentModelToUse = currentModelToUse.copy(modelId = model)
-    }
+    override suspend fun translateMessage(msg: String): String =
+        withContext(Dispatchers.IO) {
+            runCatching {
+                val chatCompletionRequest =
+                    ChatCompletionRequest(
+                        temperature = localDataStorage.tempFlow.first(),
+                        model = ModelId(localDataStorage.currentGptModel.first()),
+                        messages =
+                            listOf(
+                                ChatMessage(
+                                    role = Role.System,
+                                    content = "Translate the next message to English, Give me only the translation and nothing else",
+                                ),
+                                ChatMessage(
+                                    role = Role.User,
+                                    content = "\"$msg\"",
+                                ),
+                            ),
+                    )
+                val completion = openAiClient.openAi.chatCompletion(chatCompletionRequest)
+                val receivedMessage =
+                    completion.choices
+                        .first()
+                        .message
+                receivedMessage.content ?: ""
+            }.onFailure {
+                println(it)
+            }.getOrDefault("")
+        }
 
     override fun setBehavior(msg: String) {
         val presentBehavior = messages.find { it.role == Role.System }
@@ -77,8 +91,8 @@ class AiPalRepoImpl(
             runCatching {
                 val chatCompletionRequest =
                     ChatCompletionRequest(
-                        temperature = 0.3,
-                        model = ModelId(currentModelToUse.modelId),
+                        temperature = localDataStorage.tempFlow.first(),
+                        model = ModelId(localDataStorage.currentGptModel.first()),
                         messages =
                             messages.map {
                                 ChatMessage(

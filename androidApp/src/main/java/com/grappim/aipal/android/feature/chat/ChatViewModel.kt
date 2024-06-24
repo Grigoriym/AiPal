@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.lighthousegames.logging.logging
 import org.vosk.Model
 import org.vosk.Recognizer
 import org.vosk.android.SpeechService
@@ -28,24 +29,41 @@ class ChatViewModel(
     private var model: Model? = null
     private var speechService: SpeechService? = null
 
+    private val logging = logging()
+
     init {
         viewModelScope.launch {
             launch {
                 recognitionManager.state.collect { value ->
                     val message = state.value.clientMessage + " " + value.result
-                    println("here is the result: $message")
+                    logging.d { "here is the result: $message" }
                     _state.update { it.copy(clientMessage = message) }
                 }
             }
             launch {
                 aiPalRepo.resultMessage.collect { value ->
-                    val uiMessage = ChatMessageUI(value, false)
+                    val uiMessage = ChatMessageUI(message = value, isUserMessage = false)
                     _state.update {
                         it.copy(
                             assistantMessage = value,
                             listMessages = it.listMessages + uiMessage,
                         )
                     }
+                }
+            }
+        }
+    }
+
+    fun translateMessage(chatMessageUI: ChatMessageUI) {
+        viewModelScope.launch {
+            val result = aiPalRepo.translateMessage(chatMessageUI.message)
+            if (result.isNotEmpty()) {
+                val newUiMessage = chatMessageUI.copy(translation = result)
+                val messages = state.value.listMessages.toMutableList()
+                val index = messages.indexOf(chatMessageUI)
+                messages[index] = newUiMessage
+                _state.update {
+                    it.copy(listMessages = messages.toList())
                 }
             }
         }
@@ -59,25 +77,28 @@ class ChatViewModel(
 
     fun sendMessage() {
         viewModelScope.launch {
-            toggleSTT()
+            turnOffSpeechService()
             val msgToSend = state.value.clientMessage
-            val uiMessage = ChatMessageUI(msgToSend, true)
+            val uiMessage = ChatMessageUI(message = msgToSend, isUserMessage = true)
             _state.update {
                 it.copy(
                     clientMessage = "",
                     listMessages = it.listMessages + uiMessage,
                 )
             }
-
             aiPalRepo.sendMessage(msgToSend)
         }
     }
 
+    private fun turnOffSpeechService() {
+        speechService?.stop()
+        speechService = null
+        toggleIdleState()
+    }
+
     fun toggleSTT() {
         if (speechService != null) {
-            speechService?.stop()
-            speechService = null
-            toggleIdleState()
+            turnOffSpeechService()
         } else {
             viewModelScope.launch {
                 if (model != null) {
@@ -89,7 +110,7 @@ class ChatViewModel(
                             println(throwable)
                             toggleIdleState()
                         }.collect { resultModel ->
-                            println("Model loaded")
+                            logging.d { "Model loaded" }
                             model = resultModel
 
                             startListening()

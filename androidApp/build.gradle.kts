@@ -59,6 +59,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+
+        isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
         jvmTarget = "1.8"
@@ -66,6 +68,7 @@ android {
 }
 
 dependencies {
+    coreLibraryDesugaring(libs.android.desugarJdkLibs)
     implementation(platform(libs.androidx.compose.bom))
     implementation(projects.shared)
     implementation(libs.compose.ui)
@@ -91,4 +94,5 @@ dependencies {
     implementation(libs.tts)
     implementation(libs.tts.compose)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.datastore.prefs)
 }
