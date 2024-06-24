@@ -1,0 +1,51 @@
+[versions]
+compose-bom = "2024.06.00"
+agp = "8.5.0"
+kotlin = "2.0.0"
+compose = "1.5.4"
+compose-material3 = "1.1.2"
+androidx-activityCompose = "1.8.0"
+kotlinxCoroutines = "1.8.0"
+openaiClientBom = "3.8.1"
+koin = "3.5.0"
+tts = "2.5.0"
+vosk = "0.3.47"
+accompanist = "0.34.0"
+kotlin-serialization = "1.6.3"
+navigation = "2.7.7"
+
+[libraries]
+androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+compose-ui = { module = "androidx.compose.ui:ui"}
+androidx-compose-material-core = { module = "androidx.compose.material:material" }
+androidx-compose-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
+androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
+compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+compose-foundation = { module = "androidx.compose.foundation:foundation" }
+compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "compose-material3" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp" }
+openai-client = { module = "com.aallam.openai:openai-client" }
+openai-client-bom = { module = "com.aallam.openai:openai-client-bom", version.ref = "openaiClientBom" }
+koinBom = { module = "io.insert-koin:koin-bom", version.ref = "koin" }
+koinCore = { module = "io.insert-koin:koin-core" }
+koinAndroid = { module = "io.insert-koin:koin-android" }
+koinCompose = { module = "io.insert-koin:koin-androidx-compose" }
+tts = { module = "nl.marc-apps:tts", version.ref = "tts" }
+tts-compose = { module = "nl.marc-apps:tts-compose", version.ref = "tts" }
+voskAndroid = { module = "com.alphacephei:vosk-android", version.ref = "vosk" }
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
+kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
+
+[plugins]
+androidApplication = { id = "com.android.application", version.ref = "agp" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
