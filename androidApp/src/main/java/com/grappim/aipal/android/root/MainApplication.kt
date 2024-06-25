@@ -48,6 +48,9 @@ class MainApplication : Application() {
                         get<LocalDataStorage>(),
                     )
                 }
+                viewModel {
+                    MainViewModel(get<LocalDataStorage>())
+                }
                 single<RecognitionManager> { RecognitionManagerImpl(get<RecognitionMessageDecoder>()) }
                 factory<RecognitionModelRetriever> { RecognitionModelRetrieverImpl(get<Context>()) }
                 factory<RecognitionMessageDecoder> { RecognitionMessageDecoderImpl(get<Json>()) }
