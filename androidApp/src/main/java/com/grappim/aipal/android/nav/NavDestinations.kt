@@ -14,4 +14,8 @@ sealed interface NavDestinations {
     data object Prompts : NavDestinations {
         override val route: String = "prompts_route"
     }
+
+    data object ApiKeys : NavDestinations {
+        override val route: String = "api_key_route"
+    }
 }

@@ -5,6 +5,8 @@ import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.grappim.aipal.android.core.LaunchedEffectResult
+import com.grappim.aipal.android.data.OpenAiEmptyApiKeyException
 import com.grappim.aipal.android.data.repo.AiPalRepo
 import com.grappim.aipal.android.recognition.RecognitionManager
 import com.grappim.aipal.android.recognition.RecognitionModelRetriever
@@ -27,7 +29,8 @@ class ChatViewModel(
         ChatState(
             onMessageClear = ::onMessageClear,
             onEditMessage = ::editResultMessage,
-            toggleSTT = ::toggleSTT
+            toggleSTT = ::toggleSTT,
+            dismissSnackbar = ::dismissSnackbar
         )
     )
     val state = _state.asStateFlow()
@@ -46,18 +49,11 @@ class ChatViewModel(
                     _state.update { it.copy(clientMessage = message) }
                 }
             }
-            launch {
-                aiPalRepo.resultMessage.collect { value ->
-                    val uiMessage = ChatMessageUI(message = value, isUserMessage = false)
-                    _state.update {
-                        it.copy(
-                            assistantMessage = value,
-                            listMessages = it.listMessages + uiMessage,
-                        )
-                    }
-                }
-            }
         }
+    }
+
+    private fun dismissSnackbar() {
+        _state.update { it.copy(snackbarMessage = LaunchedEffectResult(SnackbarData())) }
     }
 
     private fun onMessageClear() {
@@ -67,13 +63,26 @@ class ChatViewModel(
     fun translateMessage(chatMessageUI: ChatMessageUI) {
         viewModelScope.launch {
             val result = aiPalRepo.translateMessage(chatMessageUI.message)
-            if (result.isNotEmpty()) {
-                val newUiMessage = chatMessageUI.copy(translation = result)
-                val messages = state.value.listMessages.toMutableList()
-                val index = messages.indexOf(chatMessageUI)
-                messages[index] = newUiMessage
+            result.onFailure { e ->
                 _state.update {
-                    it.copy(listMessages = messages.toList())
+                    it.copy(
+                        snackbarMessage = LaunchedEffectResult(
+                            SnackbarData(
+                                message = e.message ?: "Error, try checking api key",
+                                goToApiKeysScreen = e is OpenAiEmptyApiKeyException
+                            )
+                        )
+                    )
+                }
+            }.onSuccess { value ->
+                if (value.isNotEmpty()) {
+                    val newUiMessage = chatMessageUI.copy(translation = value)
+                    val messages = state.value.listMessages.toMutableList()
+                    val index = messages.indexOf(chatMessageUI)
+                    messages[index] = newUiMessage
+                    _state.update {
+                        it.copy(listMessages = messages.toList())
+                    }
                 }
             }
         }
@@ -96,7 +105,27 @@ class ChatViewModel(
                     listMessages = it.listMessages + uiMessage,
                 )
             }
-            aiPalRepo.sendMessage(msgToSend)
+            val result = aiPalRepo.sendMessage(msgToSend)
+            result.onFailure { e ->
+                _state.update {
+                    it.copy(
+                        snackbarMessage = LaunchedEffectResult(
+                            SnackbarData(
+                                message = e.message ?: "Error, try checking api key",
+                                goToApiKeysScreen = e is OpenAiEmptyApiKeyException
+                            )
+                        )
+                    )
+                }
+            }.onSuccess { value ->
+                val resultUiMessage = ChatMessageUI(message = value, isUserMessage = false)
+                _state.update {
+                    it.copy(
+                        assistantMessage = value,
+                        listMessages = it.listMessages + resultUiMessage,
+                    )
+                }
+            }
         }
     }
 

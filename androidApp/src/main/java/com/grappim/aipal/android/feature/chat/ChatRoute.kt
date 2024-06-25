@@ -31,6 +31,9 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -38,7 +41,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,7 +67,8 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ChatRoute(
     viewModel: ChatViewModel = koinViewModel(),
-    goToSettings: () -> Unit
+    goToSettings: () -> Unit,
+    goToApiKeySetup: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
     val permissionState = rememberPermissionState(permission = Manifest.permission.RECORD_AUDIO)
@@ -69,10 +77,32 @@ fun ChatRoute(
     val keyboard = LocalSoftwareKeyboardController.current
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
     val listState = rememberLazyListState()
+    val snackbarHostSate = remember {
+        SnackbarHostState()
+    }
 
     if (!permissionState.status.isGranted) {
         LaunchedEffect(true) {
             permissionState.launchPermissionRequest()
+        }
+    }
+
+    LaunchedEffect(state.snackbarMessage) {
+        if (state.snackbarMessage.data.message.isNotEmpty()) {
+            val result = snackbarHostSate.showSnackbar(
+                message = state.snackbarMessage.data.message,
+                actionLabel = if (state.snackbarMessage.data.goToApiKeysScreen) "Set up Key" else null
+            )
+            when (result) {
+                SnackbarResult.ActionPerformed -> {
+                    goToApiKeySetup()
+                    state.dismissSnackbar()
+                }
+
+                SnackbarResult.Dismissed -> {
+                    snackbarHostSate.currentSnackbarData?.dismiss()
+                }
+            }
         }
     }
 
@@ -93,6 +123,7 @@ fun ChatRoute(
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostSate) },
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(text = "Chat") },

@@ -20,6 +20,7 @@ interface LocalDataStorage {
     val darkThemeConfig: Flow<DarkThemeConfig>
     val translationPrompt: Flow<String>
     val behavior: Flow<String>
+    val openAiApiKey: Flow<String>
 
     suspend fun setCurrentGptModel(model: String)
 
@@ -30,6 +31,7 @@ interface LocalDataStorage {
 
     suspend fun setTranslationPrompt(prompt: String)
     suspend fun setBehavior(text: String)
+    suspend fun setOpenAiApiKey(key: String)
 }
 
 class LocalDataStorageImpl(
@@ -44,6 +46,12 @@ class LocalDataStorageImpl(
             .map { value: Preferences ->
                 value[tempKey] ?: DEFAULT_TEMPERATURE
             }
+
+    private val openAiApiKeyKey = stringPreferencesKey("open_ai_api_key_key")
+    override val openAiApiKey: Flow<String> = dataStore.data
+        .map { value ->
+            value[openAiApiKeyKey] ?: ""
+        }
 
     private val translationPromptKey = stringPreferencesKey("translation_prompt_key")
     override val translationPrompt: Flow<String> = dataStore.data.map { value ->
@@ -107,6 +115,12 @@ class LocalDataStorageImpl(
     override suspend fun setBehavior(text: String) {
         dataStore.edit { settings ->
             settings[behaviorKey] = text
+        }
+    }
+
+    override suspend fun setOpenAiApiKey(key: String) {
+        dataStore.edit { settings ->
+            settings[openAiApiKeyKey] = key
         }
     }
 }

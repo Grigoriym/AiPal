@@ -3,6 +3,7 @@ package com.grappim.aipal.android.feature.chat
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.grappim.aipal.android.core.LaunchedEffectResult
 
 data class ChatState(
     val listeningState: ListeningState = ListeningState.Idle,
@@ -14,10 +15,17 @@ data class ChatState(
     val listMessages: List<ChatMessageUI> = emptyList(),
     val onMessageClear: () -> Unit,
     val onEditMessage: (String) -> Unit,
-    val toggleSTT: () -> Unit
+    val toggleSTT: () -> Unit,
+    val snackbarMessage: LaunchedEffectResult<SnackbarData> = LaunchedEffectResult(SnackbarData()),
+    val dismissSnackbar: () -> Unit
 ) {
     fun getMessagesForUi() = listMessages.filter { it.message.isNotEmpty() }
 }
+
+data class SnackbarData(
+    val message: String = "",
+    val goToApiKeysScreen: Boolean = false
+)
 
 sealed interface ListeningState {
     data object Idle : ListeningState
