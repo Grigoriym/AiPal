@@ -19,6 +19,7 @@ import com.grappim.aipal.android.data.local.DarkThemeConfig
 import com.grappim.aipal.android.feature.chat.ChatRoute
 import com.grappim.aipal.android.feature.prompts.PromptsRoute
 import com.grappim.aipal.android.feature.settings.SettingsRoute
+import com.grappim.aipal.android.feature.settings.ai.AiSettingsRoute
 import com.grappim.aipal.android.feature.settings.apiKeys.GptSettingsRoute
 import com.grappim.aipal.android.nav.NavDestinations
 import com.grappim.aipal.android.uikit.MyApplicationTheme
@@ -63,6 +64,8 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate(NavDestinations.Prompts.route)
                             }, goToApiKeysSettings = {
                                 navController.navigate(NavDestinations.ApiKeys.route)
+                            }, goToAiSettings = {
+                                navController.navigate(NavDestinations.AiSettings.route)
                             })
                         }
                         composable(NavDestinations.Prompts.route) {
@@ -74,6 +77,11 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(NavDestinations.ApiKeys.route) {
                             GptSettingsRoute(onBack = {
+                                navController.popBackStack()
+                            })
+                        }
+                        composable(NavDestinations.AiSettings.route) {
+                            AiSettingsRoute(onBack = {
                                 navController.popBackStack()
                             })
                         }

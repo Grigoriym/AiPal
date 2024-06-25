@@ -14,7 +14,7 @@ data class ChatState(
     val fabIcon: ImageVector = Icons.Filled.Mic,
     val listMessages: List<ChatMessageUI> = emptyList(),
     val onMessageClear: () -> Unit,
-    val onEditMessage: (String) -> Unit,
+    val onEditClientMessage: (String) -> Unit,
     val toggleSTT: () -> Unit,
     val snackbarMessage: LaunchedEffectResult<SnackbarData> = LaunchedEffectResult(SnackbarData()),
     val dismissSnackbar: () -> Unit

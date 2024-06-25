@@ -28,7 +28,7 @@ class ChatViewModel(
     private val _state = MutableStateFlow(
         ChatState(
             onMessageClear = ::onMessageClear,
-            onEditMessage = ::editResultMessage,
+            onEditClientMessage = ::editResultMessage,
             toggleSTT = ::toggleSTT,
             dismissSnackbar = ::dismissSnackbar
         )
@@ -46,7 +46,7 @@ class ChatViewModel(
                 recognitionManager.state.collect { value ->
                     val message = state.value.clientMessage + " " + value.result
                     logging.d { "here is the result: $message" }
-                    _state.update { it.copy(clientMessage = message) }
+                    _state.update { it.copy(clientMessage = message.trim()) }
                 }
             }
         }
@@ -146,7 +146,9 @@ class ChatViewModel(
                     recognitionModelRetriever
                         .flowFromModel()
                         .catch { throwable ->
-                            println(throwable)
+                            logging.e(throwable) {
+                                "Failed to load model"
+                            }
                             toggleIdleState()
                         }.collect { resultModel ->
                             logging.d { "Model loaded" }

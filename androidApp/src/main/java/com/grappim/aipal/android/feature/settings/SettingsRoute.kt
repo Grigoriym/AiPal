@@ -17,7 +17,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.grappim.aipal.android.feature.settings.ai.AiOptionsDialog
 import com.grappim.aipal.android.feature.settings.ui.UiOptionDialog
 import com.grappim.aipal.android.uikit.PlatoTopBar
 import org.koin.androidx.compose.koinViewModel
@@ -27,7 +26,8 @@ fun SettingsRoute(
     viewModel: SettingsViewModel = koinViewModel(),
     onBack: () -> Unit,
     goToPrompts: () -> Unit,
-    goToApiKeysSettings: () -> Unit
+    goToApiKeysSettings: () -> Unit,
+    goToAiSettings: () -> Unit
 ) {
     val context = LocalContext.current
     val ttsIntent by remember { mutableStateOf(Intent("com.android.settings.TTS_SETTINGS")) }
@@ -38,18 +38,14 @@ fun SettingsRoute(
             PlatoTopBar(onBack = onBack, title = "Settings")
         },
     ) { paddingValues ->
-        AiOptionsDialog(
-            onDismissed = { viewModel.showAiSettings(false) },
-            state = state,
-        )
         UiOptionDialog(state = state, onDismissed = { state.onShowUiSettings(false) })
 
         Column(
             modifier =
-            Modifier
-                .padding(paddingValues)
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                Modifier
+                    .padding(paddingValues)
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
         ) {
             Button(onClick = { context.startActivity(ttsIntent) }) {
                 Text(text = "Setup TTS")
@@ -65,7 +61,7 @@ fun SettingsRoute(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Button(onClick = { viewModel.showAiSettings(true) }) {
+            Button(onClick = goToAiSettings) {
                 Text(text = "AI Settings")
             }
             Button(onClick = { state.onShowUiSettings(true) }) {
