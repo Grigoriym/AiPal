@@ -69,7 +69,7 @@ class SettingsViewModel(
 
     private fun getModels() {
         viewModelScope.launch {
-            val models = aiPalRepo.getModels().map { it.id.id }
+            val models = aiPalRepo.getModels().getOrDefault(emptyList()).map { it.id.id }
             println(models.joinToString())
             localDataStorage.setGptModels(models)
         }

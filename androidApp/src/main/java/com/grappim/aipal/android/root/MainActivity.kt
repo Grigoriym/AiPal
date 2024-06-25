@@ -17,7 +17,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.grappim.aipal.android.data.local.DarkThemeConfig
 import com.grappim.aipal.android.feature.chat.ChatRoute
+import com.grappim.aipal.android.feature.prompts.PromptsRoute
 import com.grappim.aipal.android.feature.settings.SettingsRoute
+import com.grappim.aipal.android.feature.settings.apiKeys.GptSettingsRoute
 import com.grappim.aipal.android.nav.NavDestinations
 import com.grappim.aipal.android.uikit.MyApplicationTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -48,11 +50,30 @@ class MainActivity : ComponentActivity() {
                             ChatRoute(
                                 goToSettings = {
                                     navController.navigate(NavDestinations.Settings.route)
+                                },
+                                goToApiKeySetup = {
+                                    navController.navigate(NavDestinations.ApiKeys.route)
                                 }
                             )
                         }
                         composable(NavDestinations.Settings.route) {
                             SettingsRoute(onBack = {
+                                navController.popBackStack()
+                            }, goToPrompts = {
+                                navController.navigate(NavDestinations.Prompts.route)
+                            }, goToApiKeysSettings = {
+                                navController.navigate(NavDestinations.ApiKeys.route)
+                            })
+                        }
+                        composable(NavDestinations.Prompts.route) {
+                            PromptsRoute(
+                                onBack = {
+                                    navController.popBackStack()
+                                }
+                            )
+                        }
+                        composable(NavDestinations.ApiKeys.route) {
+                            GptSettingsRoute(onBack = {
                                 navController.popBackStack()
                             })
                         }

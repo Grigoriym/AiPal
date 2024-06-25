@@ -6,8 +6,10 @@ import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
+import com.grappim.aipal.android.core.DEFAULT_BEHAVIOR
 import com.grappim.aipal.android.core.DEFAULT_MODEL
 import com.grappim.aipal.android.core.DEFAULT_TEMPERATURE
+import com.grappim.aipal.android.core.DEFAULT_TRANSLATION_PROMPT
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -16,6 +18,9 @@ interface LocalDataStorage {
     val currentGptModel: Flow<String>
     val gptModels: Flow<Set<String>>
     val darkThemeConfig: Flow<DarkThemeConfig>
+    val translationPrompt: Flow<String>
+    val behavior: Flow<String>
+    val openAiApiKey: Flow<String>
 
     suspend fun setCurrentGptModel(model: String)
 
@@ -23,6 +28,10 @@ interface LocalDataStorage {
 
     suspend fun setGptModels(models: List<String>)
     suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig)
+
+    suspend fun setTranslationPrompt(prompt: String)
+    suspend fun setBehavior(text: String)
+    suspend fun setOpenAiApiKey(key: String)
 }
 
 class LocalDataStorageImpl(
@@ -37,6 +46,22 @@ class LocalDataStorageImpl(
             .map { value: Preferences ->
                 value[tempKey] ?: DEFAULT_TEMPERATURE
             }
+
+    private val openAiApiKeyKey = stringPreferencesKey("open_ai_api_key_key")
+    override val openAiApiKey: Flow<String> = dataStore.data
+        .map { value ->
+            value[openAiApiKeyKey] ?: ""
+        }
+
+    private val translationPromptKey = stringPreferencesKey("translation_prompt_key")
+    override val translationPrompt: Flow<String> = dataStore.data.map { value ->
+        value[translationPromptKey] ?: DEFAULT_TRANSLATION_PROMPT
+    }
+
+    private val behaviorKey = stringPreferencesKey("behavior_key")
+    override val behavior: Flow<String> = dataStore.data.map { value ->
+        value[behaviorKey] ?: DEFAULT_BEHAVIOR
+    }
 
     private val currentGptModelKey = stringPreferencesKey("current_gpt_key")
     override val currentGptModel: Flow<String> =
@@ -78,6 +103,24 @@ class LocalDataStorageImpl(
     override suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) {
         dataStore.edit { settings ->
             settings[darkThemeKey] = darkThemeConfig.value
+        }
+    }
+
+    override suspend fun setTranslationPrompt(prompt: String) {
+        dataStore.edit { settings ->
+            settings[translationPromptKey] = prompt
+        }
+    }
+
+    override suspend fun setBehavior(text: String) {
+        dataStore.edit { settings ->
+            settings[behaviorKey] = text
+        }
+    }
+
+    override suspend fun setOpenAiApiKey(key: String) {
+        dataStore.edit { settings ->
+            settings[openAiApiKeyKey] = key
         }
     }
 }

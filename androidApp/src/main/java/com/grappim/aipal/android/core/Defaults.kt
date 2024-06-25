@@ -6,3 +6,6 @@ const val DEFAULT_BEHAVIOR =
     "You are my German friend with whom I want to practice German. " +
             "When I finish this conversation, " +
             "show me my errors and provide ways to fix them."
+
+const val DEFAULT_TRANSLATION_PROMPT = "Translate the next message to English, " +
+        "Give me only the translation and nothing else"
