@@ -11,6 +11,7 @@ You only need your OpenAI api token (can be set in Settings) and you are ready t
     If Vosk supports a language, it can be done.
 
 ## Roadmap
+0. Make it available to copy the chat card text. I believe I need to add a copy button to client messages as well.
 1. Local history of conversations
 2. Connecting to your own server (like running ollama on your machine and creating a simple intermediary to connect to)
 3. Other AIs (like Claude, Mixtral, ...) (maybe, do not see the reason for now)
