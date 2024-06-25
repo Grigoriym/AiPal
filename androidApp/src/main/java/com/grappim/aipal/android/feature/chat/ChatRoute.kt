@@ -21,7 +21,6 @@ import androidx.compose.material.icons.automirrored.filled.Backspace
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.Card
@@ -41,11 +40,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -68,7 +64,7 @@ import org.koin.androidx.compose.koinViewModel
 fun ChatRoute(
     viewModel: ChatViewModel = koinViewModel(),
     goToSettings: () -> Unit,
-    goToApiKeySetup: () -> Unit
+    goToApiKeySetup: () -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
     val permissionState = rememberPermissionState(permission = Manifest.permission.RECORD_AUDIO)
@@ -77,9 +73,10 @@ fun ChatRoute(
     val keyboard = LocalSoftwareKeyboardController.current
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
     val listState = rememberLazyListState()
-    val snackbarHostSate = remember {
-        SnackbarHostState()
-    }
+    val snackbarHostSate =
+        remember {
+            SnackbarHostState()
+        }
 
     if (!permissionState.status.isGranted) {
         LaunchedEffect(true) {
@@ -88,11 +85,14 @@ fun ChatRoute(
     }
 
     LaunchedEffect(state.snackbarMessage) {
-        if (state.snackbarMessage.data.message.isNotEmpty()) {
-            val result = snackbarHostSate.showSnackbar(
-                message = state.snackbarMessage.data.message,
-                actionLabel = if (state.snackbarMessage.data.goToApiKeysScreen) "Set up Key" else null
-            )
+        if (state.snackbarMessage.data.message
+                .isNotEmpty()
+        ) {
+            val result =
+                snackbarHostSate.showSnackbar(
+                    message = state.snackbarMessage.data.message,
+                    actionLabel = if (state.snackbarMessage.data.goToApiKeysScreen) "Set up Key" else null,
+                )
             when (result) {
                 SnackbarResult.ActionPerformed -> {
                     goToApiKeySetup()
@@ -136,25 +136,19 @@ fun ChatRoute(
                     ) {
                         Icon(imageVector = Icons.Filled.Settings, contentDescription = "")
                     }
-//                    IconButton(
-//                        onClick = {
-//
-//                        },
-//                    ) {
-//                        Icon(imageVector = Icons.Filled.History, contentDescription = "")
-//                    }
                 },
             )
         },
-        modifier = Modifier
+        modifier =
+        Modifier
             .statusBarsPadding()
             .navigationBarsPadding()
             .imePadding(),
         bottomBar = {
             ChatBox(
                 modifier =
-                Modifier
-                    .fillMaxWidth(),
+                    Modifier
+                        .fillMaxWidth(),
                 state = state,
                 viewModel = viewModel,
             )
@@ -199,9 +193,9 @@ private fun ChatItem(
 ) {
     Row(
         modifier =
-        Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp, horizontal = 6.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp, horizontal = 6.dp),
         horizontalArrangement = if (message.isUserMessage) Arrangement.End else Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -217,15 +211,16 @@ private fun ChatItem(
             }
         }
         Card(
-            shape = RoundedCornerShape(
-                topStart = 24f,
-                topEnd = 24f,
-                bottomStart = if (message.isUserMessage) 24f else 0f,
-                bottomEnd = if (message.isUserMessage) 0f else 24f,
-            ),
+            shape =
+                RoundedCornerShape(
+                    topStart = 24f,
+                    topEnd = 24f,
+                    bottomStart = if (message.isUserMessage) 24f else 0f,
+                    bottomEnd = if (message.isUserMessage) 0f else 24f,
+                ),
         ) {
             Column(
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
             ) {
                 Text(text = message.message)
                 if (message.translation.isNotEmpty()) {
@@ -253,38 +248,41 @@ private fun ChatBox(
     Row(
         modifier = modifier.padding(16.dp),
     ) {
+        println("asdasd: \"${state.clientMessage}\"")
         TextField(
             modifier = Modifier.weight(1f),
             value = state.clientMessage,
-            onValueChange = state.onEditMessage,
+            onValueChange = state.onEditClientMessage,
             placeholder = { Text("Message...") },
             shape = RoundedCornerShape(24.dp),
-            colors = TextFieldDefaults.colors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent,
-            ),
+            colors =
+                TextFieldDefaults.colors(
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                ),
             trailingIcon = {
                 IconButton(onClick = state.onMessageClear) {
                     Icon(imageVector = Icons.AutoMirrored.Filled.Backspace, contentDescription = "")
                 }
-            }
+            },
         )
         IconButton(
             modifier =
-            Modifier
-                .clip(CircleShape)
-                .align(Alignment.CenterVertically),
+                Modifier
+                    .clip(CircleShape)
+                    .align(Alignment.CenterVertically),
             onClick = state.toggleSTT,
         ) {
             Icon(imageVector = state.fabIcon, contentDescription = "")
         }
         IconButton(
             modifier =
-            Modifier
-                .clip(CircleShape)
-                .align(Alignment.CenterVertically),
+                Modifier
+                    .clip(CircleShape)
+                    .align(Alignment.CenterVertically),
             onClick = { viewModel.sendMessage() },
+            enabled = state.clientMessage.isNotEmpty()
         ) {
             Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = "")
         }

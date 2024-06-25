@@ -18,4 +18,8 @@ sealed interface NavDestinations {
     data object ApiKeys : NavDestinations {
         override val route: String = "api_key_route"
     }
+
+    data object AiSettings : NavDestinations {
+        override val route: String = "ai_settings_route"
+    }
 }
