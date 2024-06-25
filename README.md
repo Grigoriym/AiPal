@@ -33,3 +33,6 @@ https://github.com/sollarp/voice-assistant-chatgpt
 https://github.com/AndraxDev/speak-gpt
 
 https://github.com/Marc-JB/TextToSpeechKt?tab=readme-ov-file
+
+https://github.com/paulotaylor/klaude
+https://github.com/tddworks/openai-kotlin
