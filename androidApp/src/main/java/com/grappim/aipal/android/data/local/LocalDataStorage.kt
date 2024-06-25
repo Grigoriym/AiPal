@@ -15,12 +15,14 @@ interface LocalDataStorage {
     val tempFlow: Flow<Double>
     val currentGptModel: Flow<String>
     val gptModels: Flow<Set<String>>
+    val darkThemeConfig: Flow<DarkThemeConfig>
 
     suspend fun setCurrentGptModel(model: String)
 
     suspend fun setTemperature(temp: Double)
 
     suspend fun setGptModels(models: List<String>)
+    suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig)
 }
 
 class LocalDataStorageImpl(
@@ -49,6 +51,12 @@ class LocalDataStorageImpl(
             value[gptModelsKey] ?: emptySet()
         }
 
+    private val darkThemeKey = stringPreferencesKey("dark_theme_key")
+    override val darkThemeConfig: Flow<DarkThemeConfig> = dataStore.data
+        .map { preferences ->
+            DarkThemeConfig.fromValue(preferences[darkThemeKey]) ?: DarkThemeConfig.default()
+        }
+
     override suspend fun setGptModels(models: List<String>) {
         dataStore.edit { settings ->
             settings[gptModelsKey] = models.toSet()
@@ -64,6 +72,12 @@ class LocalDataStorageImpl(
     override suspend fun setTemperature(temp: Double) {
         dataStore.edit { settings ->
             settings[tempKey] = temp
+        }
+    }
+
+    override suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) {
+        dataStore.edit { settings ->
+            settings[darkThemeKey] = darkThemeConfig.value
         }
     }
 }

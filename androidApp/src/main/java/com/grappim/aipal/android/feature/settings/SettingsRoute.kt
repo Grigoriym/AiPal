@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.grappim.aipal.android.feature.settings.ai.AiOptionsDialog
+import com.grappim.aipal.android.feature.settings.ui.UiOptionDialog
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,13 +57,14 @@ fun SettingsRoute(
             onDismissed = { viewModel.showAiSettings(false) },
             state = state,
         )
+        UiOptionDialog(state = state, onDismissed = { state.onShowUiSettings(false) })
 
         Column(
             modifier =
-                Modifier
-                    .padding(paddingValues)
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+            Modifier
+                .padding(paddingValues)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
         ) {
             Button(onClick = { context.startActivity(ttsIntent) }) {
                 Text(text = "Setup TTS")
@@ -87,6 +89,9 @@ fun SettingsRoute(
 
             Button(onClick = { viewModel.showAiSettings(true) }) {
                 Text(text = "AI Settings")
+            }
+            Button(onClick = { state.onShowUiSettings(true)}) {
+                Text(text = "UI Settings")
             }
         }
     }
