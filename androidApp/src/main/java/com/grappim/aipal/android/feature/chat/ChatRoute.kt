@@ -136,13 +136,13 @@ fun ChatRoute(
                     ) {
                         Icon(imageVector = Icons.Filled.Settings, contentDescription = "")
                     }
-                    IconButton(
-                        onClick = {
-
-                        },
-                    ) {
-                        Icon(imageVector = Icons.Filled.History, contentDescription = "")
-                    }
+//                    IconButton(
+//                        onClick = {
+//
+//                        },
+//                    ) {
+//                        Icon(imageVector = Icons.Filled.History, contentDescription = "")
+//                    }
                 },
             )
         },

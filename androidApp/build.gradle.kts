@@ -30,17 +30,6 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
-        buildConfigField(
-            "String",
-            "openAiApiKey",
-            "\"$openAiApiKey\"",
-        )
-        buildConfigField(
-            "String",
-            "openAiOrganizationId",
-            "\"$openAiOrganizationId\"",
-        )
     }
     buildFeatures {
         compose = true

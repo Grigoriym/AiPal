@@ -26,7 +26,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.grappim.aipal.android.uikit.PlatoTopBar
 import org.koin.androidx.compose.koinViewModel
@@ -37,11 +36,12 @@ fun GptSettingsRoute(onBack: () -> Unit, viewModel: ApiKeysViewModel = koinViewM
     val snackbarHostSate = remember {
         SnackbarHostState()
     }
-    LaunchedEffect(state.apiKeyCheck) {
-        if (state.apiKeyCheck.data.isNotEmpty()) {
-            val result = snackbarHostSate.showSnackbar(message = state.apiKeyCheck.data)
+    LaunchedEffect(state.snackbarMessage) {
+        if (state.snackbarMessage.data.isNotEmpty()) {
+            val result = snackbarHostSate.showSnackbar(message = state.snackbarMessage.data)
             if (result == SnackbarResult.ActionPerformed) {
                 snackbarHostSate.currentSnackbarData?.dismiss()
+                state.dismissSnackbar()
             }
         }
     }

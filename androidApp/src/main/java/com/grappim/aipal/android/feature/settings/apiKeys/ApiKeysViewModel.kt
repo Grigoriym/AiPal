@@ -19,7 +19,8 @@ class ApiKeysViewModel(
             onSetOpenAiApiKey = ::setOpenAiKey,
             saveOpenAiApiKey = ::saveOpenAiKey,
             onCheckApiKey = ::checkApiKey,
-            onKeyClear = ::clearApiKey
+            onKeyClear = ::clearApiKey,
+            dismissSnackbar = ::dismissSnackbar
         )
     )
     val state = _state.asStateFlow()
@@ -32,6 +33,10 @@ class ApiKeysViewModel(
         }
     }
 
+    private fun dismissSnackbar() {
+        _state.update { it.copy(snackbarMessage = LaunchedEffectResult("")) }
+    }
+
     private fun clearApiKey() {
         setOpenAiKey("")
     }
@@ -40,10 +45,10 @@ class ApiKeysViewModel(
         viewModelScope.launch {
             aiPalRepo.getModels()
                 .onSuccess {
-                    _state.update { it.copy(apiKeyCheck = LaunchedEffectResult("Success")) }
+                    _state.update { it.copy(snackbarMessage = LaunchedEffectResult("Success")) }
                 }
                 .onFailure {
-                    _state.update { it.copy(apiKeyCheck = LaunchedEffectResult("Failure")) }
+                    _state.update { it.copy(snackbarMessage = LaunchedEffectResult("Failure")) }
                 }
         }
     }

@@ -5,15 +5,10 @@ import android.content.Context
 import com.grappim.aipal.android.BuildConfig
 import com.grappim.aipal.android.core.dataStoreModule
 import com.grappim.aipal.android.core.jsonModule
+import com.grappim.aipal.android.core.viewModelsModule
 import com.grappim.aipal.android.data.local.LocalDataStorage
 import com.grappim.aipal.android.data.repo.AiPalRepo
 import com.grappim.aipal.android.data.repo.AiPalRepoImpl
-import com.grappim.aipal.android.data.service.OpenAiClient
-import com.grappim.aipal.android.data.service.OpenAiClientImpl
-import com.grappim.aipal.android.feature.chat.ChatViewModel
-import com.grappim.aipal.android.feature.prompts.PromptsViewModel
-import com.grappim.aipal.android.feature.settings.SettingsViewModel
-import com.grappim.aipal.android.feature.settings.apiKeys.ApiKeysViewModel
 import com.grappim.aipal.android.recognition.RecognitionManager
 import com.grappim.aipal.android.recognition.RecognitionManagerImpl
 import com.grappim.aipal.android.recognition.RecognitionMessageDecoder
@@ -23,7 +18,6 @@ import com.grappim.aipal.android.recognition.RecognitionModelRetrieverImpl
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
-import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import org.lighthousegames.logging.KmLogging
@@ -35,30 +29,8 @@ class MainApplication : Application() {
         KmLogging.setLogLevel(if (BuildConfig.DEBUG) LogLevel.Verbose else LogLevel.Off)
         val appModules =
             module {
-                single<OpenAiClient> { OpenAiClientImpl() }
-                single<AiPalRepo> { AiPalRepoImpl(get<OpenAiClient>(), get<LocalDataStorage>()) }
-                viewModel {
-                    ChatViewModel(
-                        get<AiPalRepo>(),
-                        get<RecognitionManager>(),
-                        get<RecognitionModelRetriever>(),
-                    )
-                }
-                viewModel {
-                    SettingsViewModel(
-                        get<AiPalRepo>(),
-                        get<LocalDataStorage>(),
-                    )
-                }
-                viewModel {
-                    MainViewModel(get<LocalDataStorage>())
-                }
-                viewModel {
-                    PromptsViewModel(get<LocalDataStorage>())
-                }
-                viewModel {
-                    ApiKeysViewModel(get<LocalDataStorage>(), get<AiPalRepo>())
-                }
+                single<AiPalRepo> { AiPalRepoImpl(get<LocalDataStorage>()) }
+
                 single<RecognitionManager> { RecognitionManagerImpl(get<RecognitionMessageDecoder>()) }
                 factory<RecognitionModelRetriever> { RecognitionModelRetrieverImpl(get<Context>()) }
                 factory<RecognitionMessageDecoder> { RecognitionMessageDecoderImpl(get<Json>()) }
@@ -67,7 +39,7 @@ class MainApplication : Application() {
         startKoin {
             androidLogger()
             androidContext(this@MainApplication)
-            modules(appModules, jsonModule, dataStoreModule)
+            modules(appModules, jsonModule, dataStoreModule, viewModelsModule)
         }
     }
 }

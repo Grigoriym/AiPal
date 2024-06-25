@@ -7,6 +7,7 @@ data class ApiKeysState(
     val onSetOpenAiApiKey: (String) -> Unit,
     val saveOpenAiApiKey: () -> Unit,
     val onCheckApiKey: () -> Unit,
-    val apiKeyCheck: LaunchedEffectResult<String> = LaunchedEffectResult(""),
-    val onKeyClear: () -> Unit
+    val snackbarMessage: LaunchedEffectResult<String> = LaunchedEffectResult(""),
+    val onKeyClear: () -> Unit,
+    val dismissSnackbar: () -> Unit
 )
