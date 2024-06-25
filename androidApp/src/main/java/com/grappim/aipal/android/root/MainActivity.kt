@@ -17,6 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.grappim.aipal.android.data.local.DarkThemeConfig
 import com.grappim.aipal.android.feature.chat.ChatRoute
+import com.grappim.aipal.android.feature.prompts.PromptsRoute
 import com.grappim.aipal.android.feature.settings.SettingsRoute
 import com.grappim.aipal.android.nav.NavDestinations
 import com.grappim.aipal.android.uikit.MyApplicationTheme
@@ -54,7 +55,16 @@ class MainActivity : ComponentActivity() {
                         composable(NavDestinations.Settings.route) {
                             SettingsRoute(onBack = {
                                 navController.popBackStack()
+                            }, goToPrompts = {
+                                navController.navigate(NavDestinations.Prompts.route)
                             })
+                        }
+                        composable(NavDestinations.Prompts.route) {
+                            PromptsRoute(
+                                onBack = {
+                                    navController.popBackStack()
+                                }
+                            )
                         }
                     }
                 }

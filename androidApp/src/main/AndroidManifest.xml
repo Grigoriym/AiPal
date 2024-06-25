@@ -8,6 +8,7 @@
         android:name=".root.MainApplication"
         android:allowBackup="false"
         android:supportsRtl="true"
+        android:label="AiPal"
         android:theme="@style/AppTheme">
         <activity
             android:name=".root.MainActivity"

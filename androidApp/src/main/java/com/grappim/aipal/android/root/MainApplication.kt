@@ -11,6 +11,7 @@ import com.grappim.aipal.android.data.repo.AiPalRepoImpl
 import com.grappim.aipal.android.data.service.OpenAiClient
 import com.grappim.aipal.android.data.service.OpenAiClientImpl
 import com.grappim.aipal.android.feature.chat.ChatViewModel
+import com.grappim.aipal.android.feature.prompts.PromptsViewModel
 import com.grappim.aipal.android.feature.settings.SettingsViewModel
 import com.grappim.aipal.android.recognition.RecognitionManager
 import com.grappim.aipal.android.recognition.RecognitionManagerImpl
@@ -50,6 +51,9 @@ class MainApplication : Application() {
                 }
                 viewModel {
                     MainViewModel(get<LocalDataStorage>())
+                }
+                viewModel {
+                    PromptsViewModel(get<LocalDataStorage>())
                 }
                 single<RecognitionManager> { RecognitionManagerImpl(get<RecognitionMessageDecoder>()) }
                 factory<RecognitionModelRetriever> { RecognitionModelRetrieverImpl(get<Context>()) }

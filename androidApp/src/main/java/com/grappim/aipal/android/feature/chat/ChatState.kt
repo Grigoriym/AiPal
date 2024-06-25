@@ -11,7 +11,10 @@ data class ChatState(
     val models: List<String> = emptyList(),
     val isSynthesizing: Boolean = false,
     val fabIcon: ImageVector = Icons.Filled.Mic,
-    val listMessages: List<ChatMessageUI> = emptyList()
+    val listMessages: List<ChatMessageUI> = emptyList(),
+    val onMessageClear: () -> Unit,
+    val onEditMessage: (String) -> Unit,
+    val toggleSTT: () -> Unit
 ) {
     fun getMessagesForUi() = listMessages.filter { it.message.isNotEmpty() }
 }

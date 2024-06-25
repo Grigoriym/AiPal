@@ -37,10 +37,12 @@ fun UiOptionDialog(state: SettingsState, onDismissed: () -> Unit) {
                 shape = RoundedCornerShape(16.dp),
             ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     DarkModePreferencesContent(state = state)
+                    Spacer(modifier = Modifier.height(12.dp))
                     Button(onClick = onDismissed) {
                         Text(text = "Ok")
                     }

@@ -13,7 +13,6 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,6 +32,7 @@ import org.koin.androidx.compose.koinViewModel
 fun SettingsRoute(
     viewModel: SettingsViewModel = koinViewModel(),
     onBack: () -> Unit,
+    goToPrompts: () -> Unit
 ) {
     val context = LocalContext.current
     val ttsIntent by remember { mutableStateOf(Intent("com.android.settings.TTS_SETTINGS")) }
@@ -70,19 +70,8 @@ fun SettingsRoute(
                 Text(text = "Setup TTS")
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = state.behavior,
-                onValueChange = state.onBehaviorValueChange,
-                label = { Text("Behavior") },
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Button(onClick = state.onSetBehavior) {
-                Text(text = "Set behavior")
+            Button(onClick = goToPrompts) {
+                Text(text = "Setup Prompts")
             }
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -90,7 +79,7 @@ fun SettingsRoute(
             Button(onClick = { viewModel.showAiSettings(true) }) {
                 Text(text = "AI Settings")
             }
-            Button(onClick = { state.onShowUiSettings(true)}) {
+            Button(onClick = { state.onShowUiSettings(true) }) {
                 Text(text = "UI Settings")
             }
         }

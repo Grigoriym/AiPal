@@ -23,7 +23,13 @@ class ChatViewModel(
     private val recognitionManager: RecognitionManager,
     private val recognitionModelRetriever: RecognitionModelRetriever,
 ) : ViewModel() {
-    private val _state = MutableStateFlow(ChatState())
+    private val _state = MutableStateFlow(
+        ChatState(
+            onMessageClear = ::onMessageClear,
+            onEditMessage = ::editResultMessage,
+            toggleSTT = ::toggleSTT
+        )
+    )
     val state = _state.asStateFlow()
 
     private var model: Model? = null
@@ -54,6 +60,10 @@ class ChatViewModel(
         }
     }
 
+    private fun onMessageClear() {
+        editResultMessage("")
+    }
+
     fun translateMessage(chatMessageUI: ChatMessageUI) {
         viewModelScope.launch {
             val result = aiPalRepo.translateMessage(chatMessageUI.message)
@@ -69,7 +79,7 @@ class ChatViewModel(
         }
     }
 
-    fun editResultMessage(newMsg: String) {
+    private fun editResultMessage(newMsg: String) {
         viewModelScope.launch {
             _state.update { it.copy(clientMessage = newMsg) }
         }
@@ -96,7 +106,7 @@ class ChatViewModel(
         toggleIdleState()
     }
 
-    fun toggleSTT() {
+    private fun toggleSTT() {
         if (speechService != null) {
             turnOffSpeechService()
         } else {
@@ -112,7 +122,6 @@ class ChatViewModel(
                         }.collect { resultModel ->
                             logging.d { "Model loaded" }
                             model = resultModel
-
                             startListening()
                         }
                 }

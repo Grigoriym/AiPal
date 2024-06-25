@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -39,12 +40,13 @@ fun AiOptionsDialog(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .height(375.dp)
+                        .wrapContentHeight()
                         .padding(16.dp),
                 shape = RoundedCornerShape(16.dp),
             ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
@@ -78,6 +80,7 @@ fun AiOptionsDialog(
                             state.onSetModel(value)
                         },
                     )
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     Button(onClick = state.applySettings) {
                         Text(text = "Apply")

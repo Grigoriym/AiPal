@@ -10,4 +10,8 @@ sealed interface NavDestinations {
     data object Settings : NavDestinations {
         override val route: String = "settings_route"
     }
+
+    data object Prompts : NavDestinations {
+        override val route: String = "prompts_route"
+    }
 }

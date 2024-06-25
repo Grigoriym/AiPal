@@ -13,7 +13,6 @@ class OpenAiClientImpl : OpenAiClient {
     override val openAi: OpenAI =
         OpenAI(
             token = BuildConfig.openAiApiKey,
-            organization = BuildConfig.openAiOrganizationId,
             logging =
                 LoggingConfig(
                     logLevel = LogLevel.All,

@@ -51,7 +51,7 @@ class AiPalRepoImpl(
                             listOf(
                                 ChatMessage(
                                     role = Role.System,
-                                    content = "Translate the next message to English, Give me only the translation and nothing else",
+                                    content = localDataStorage.translationPrompt.first(),
                                 ),
                                 ChatMessage(
                                     role = Role.User,
