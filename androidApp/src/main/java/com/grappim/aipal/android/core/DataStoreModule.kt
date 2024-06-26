@@ -5,8 +5,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
-import com.grappim.aipal.android.data.local.LocalDataStorage
 import com.grappim.aipal.android.data.local.LocalDataStorageImpl
+import com.grappim.aipal.data.local.LocalDataStorage
 import org.koin.dsl.module
 
 val dataStoreModule =

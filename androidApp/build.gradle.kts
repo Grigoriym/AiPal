@@ -72,10 +72,10 @@ dependencies {
     implementation(libs.openai.client)
     runtimeOnly(libs.ktor.client.okhttp)
 
-    implementation(platform(libs.koinBom))
-    implementation(libs.koinCore)
-    implementation(libs.koinAndroid)
-    implementation(libs.koinCompose)
+    implementation(libs.koin.android)
+    implementation(libs.koin.core)
+    implementation(libs.koin.compose)
+    implementation(libs.koin.androidx.compose)
 
     implementation(libs.voskAndroid)
     implementation(libs.accompanist.permissions)

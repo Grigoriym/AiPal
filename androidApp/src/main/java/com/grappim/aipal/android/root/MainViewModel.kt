@@ -2,7 +2,8 @@ package com.grappim.aipal.android.root
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.grappim.aipal.android.data.local.LocalDataStorage
+import com.grappim.aipal.data.local.LocalDataStorage
+import com.grappim.aipal.feature.main.MainState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

@@ -24,7 +24,6 @@ import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.Card
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -54,6 +53,9 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.grappim.aipal.feature.chat.ChatMessageUI
+import com.grappim.aipal.feature.chat.ChatState
+import com.grappim.aipal.widgets.PlatoTopBar
 import kotlinx.coroutines.launch
 import nl.marc_apps.tts.TextToSpeechEngine
 import nl.marc_apps.tts.rememberTextToSpeechOrNull
@@ -125,19 +127,16 @@ fun ChatRoute(
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostSate) },
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(text = "Chat") },
-                actions = {
-                    IconButton(
-                        onClick = {
-                            keyboard?.hide()
-                            goToSettings()
-                        },
-                    ) {
-                        Icon(imageVector = Icons.Filled.Settings, contentDescription = "")
-                    }
-                },
-            )
+            PlatoTopBar(title = "Chat", actions = {
+                IconButton(
+                    onClick = {
+                        keyboard?.hide()
+                        goToSettings()
+                    },
+                ) {
+                    Icon(imageVector = Icons.Filled.Settings, contentDescription = "")
+                }
+            })
         },
         modifier =
         Modifier
@@ -147,8 +146,8 @@ fun ChatRoute(
         bottomBar = {
             ChatBox(
                 modifier =
-                    Modifier
-                        .fillMaxWidth(),
+                Modifier
+                    .fillMaxWidth(),
                 state = state,
                 viewModel = viewModel,
             )
@@ -193,9 +192,9 @@ private fun ChatItem(
 ) {
     Row(
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp, horizontal = 6.dp),
+        Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp, horizontal = 6.dp),
         horizontalArrangement = if (message.isUserMessage) Arrangement.End else Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -212,12 +211,12 @@ private fun ChatItem(
         }
         Card(
             shape =
-                RoundedCornerShape(
-                    topStart = 24f,
-                    topEnd = 24f,
-                    bottomStart = if (message.isUserMessage) 24f else 0f,
-                    bottomEnd = if (message.isUserMessage) 0f else 24f,
-                ),
+            RoundedCornerShape(
+                topStart = 24f,
+                topEnd = 24f,
+                bottomStart = if (message.isUserMessage) 24f else 0f,
+                bottomEnd = if (message.isUserMessage) 0f else 24f,
+            ),
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
@@ -248,7 +247,6 @@ private fun ChatBox(
     Row(
         modifier = modifier.padding(16.dp),
     ) {
-        println("asdasd: \"${state.clientMessage}\"")
         TextField(
             modifier = Modifier.weight(1f),
             value = state.clientMessage,
@@ -256,11 +254,11 @@ private fun ChatBox(
             placeholder = { Text("Message...") },
             shape = RoundedCornerShape(24.dp),
             colors =
-                TextFieldDefaults.colors(
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent,
-                ),
+            TextFieldDefaults.colors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent,
+            ),
             trailingIcon = {
                 IconButton(onClick = state.onMessageClear) {
                     Icon(imageVector = Icons.AutoMirrored.Filled.Backspace, contentDescription = "")
@@ -269,18 +267,18 @@ private fun ChatBox(
         )
         IconButton(
             modifier =
-                Modifier
-                    .clip(CircleShape)
-                    .align(Alignment.CenterVertically),
+            Modifier
+                .clip(CircleShape)
+                .align(Alignment.CenterVertically),
             onClick = state.toggleSTT,
         ) {
             Icon(imageVector = state.fabIcon, contentDescription = "")
         }
         IconButton(
             modifier =
-                Modifier
-                    .clip(CircleShape)
-                    .align(Alignment.CenterVertically),
+            Modifier
+                .clip(CircleShape)
+                .align(Alignment.CenterVertically),
             onClick = { viewModel.sendMessage() },
             enabled = state.clientMessage.isNotEmpty()
         ) {

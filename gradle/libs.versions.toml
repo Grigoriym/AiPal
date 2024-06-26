@@ -1,4 +1,9 @@
 [versions]
+koin = "3.5.6"
+koin-compose-multiplatform = "1.1.5"
+
+voyager = "1.1.0-beta02"
+
 compose-bom = "2024.06.00"
 agp = "8.5.0"
 kotlin = "2.0.0"
@@ -7,7 +12,6 @@ compose-material3 = "1.1.2"
 androidx-activityCompose = "1.8.0"
 kotlinxCoroutines = "1.8.0"
 openaiClientBom = "3.8.1"
-koin = "3.5.0"
 tts = "2.5.0"
 vosk = "0.3.47"
 accompanist = "0.34.0"
@@ -16,8 +20,17 @@ navigation = "2.7.7"
 androidDesugarJdkLibs = "2.0.4"
 datastore-prefs = "1.1.1"
 logging = "1.5.0"
+ksp = "2.0.0-1.0.22"
+compose-plugin = "1.6.11"
 
 [libraries]
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin-compose-multiplatform" }
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
+
+voyager = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
+
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
@@ -33,10 +46,6 @@ kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-c
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp" }
 openai-client = { module = "com.aallam.openai:openai-client" }
 openai-client-bom = { module = "com.aallam.openai:openai-client-bom", version.ref = "openaiClientBom" }
-koinBom = { module = "io.insert-koin:koin-bom", version.ref = "koin" }
-koinCore = { module = "io.insert-koin:koin-core" }
-koinAndroid = { module = "io.insert-koin:koin-android" }
-koinCompose = { module = "io.insert-koin:koin-androidx-compose" }
 tts = { module = "nl.marc-apps:tts", version.ref = "tts" }
 tts-compose = { module = "nl.marc-apps:tts-compose", version.ref = "tts" }
 voskAndroid = { module = "com.alphacephei:vosk-android", version.ref = "vosk" }
@@ -55,3 +64,5 @@ kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref =
 kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }

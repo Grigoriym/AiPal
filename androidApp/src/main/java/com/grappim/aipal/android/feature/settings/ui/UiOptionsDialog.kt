@@ -18,11 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.grappim.aipal.android.data.local.DarkThemeConfig
-import com.grappim.aipal.android.data.local.isDark
-import com.grappim.aipal.android.data.local.isLight
-import com.grappim.aipal.android.data.local.isSystemDefault
-import com.grappim.aipal.android.feature.settings.SettingsState
+import com.grappim.aipal.data.model.DarkThemeConfig
+import com.grappim.aipal.data.model.isDark
+import com.grappim.aipal.data.model.isLight
+import com.grappim.aipal.data.model.isSystemDefault
+import com.grappim.aipal.feature.settings.SettingsState
 
 @Composable
 fun UiOptionDialog(state: SettingsState, onDismissed: () -> Unit) {

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -7,9 +8,10 @@
     <application
         android:name=".root.MainApplication"
         android:allowBackup="false"
-        android:supportsRtl="true"
         android:label="AiPal"
-        android:theme="@style/AppTheme">
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        tools:replace="android:theme, android:name">
         <activity
             android:name=".root.MainActivity"
             android:exported="true"

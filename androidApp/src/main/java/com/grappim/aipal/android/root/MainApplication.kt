@@ -6,8 +6,6 @@ import com.grappim.aipal.android.BuildConfig
 import com.grappim.aipal.android.core.dataStoreModule
 import com.grappim.aipal.android.core.jsonModule
 import com.grappim.aipal.android.core.viewModelsModule
-import com.grappim.aipal.android.data.local.LocalDataStorage
-import com.grappim.aipal.android.data.repo.AiPalRepo
 import com.grappim.aipal.android.data.repo.AiPalRepoImpl
 import com.grappim.aipal.android.recognition.RecognitionManager
 import com.grappim.aipal.android.recognition.RecognitionManagerImpl
@@ -15,6 +13,8 @@ import com.grappim.aipal.android.recognition.RecognitionMessageDecoder
 import com.grappim.aipal.android.recognition.RecognitionMessageDecoderImpl
 import com.grappim.aipal.android.recognition.RecognitionModelRetriever
 import com.grappim.aipal.android.recognition.RecognitionModelRetrieverImpl
+import com.grappim.aipal.data.local.LocalDataStorage
+import com.grappim.aipal.data.repo.AiPalRepo
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger

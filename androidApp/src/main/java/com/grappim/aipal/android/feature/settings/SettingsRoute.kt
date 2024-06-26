@@ -18,7 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.grappim.aipal.android.feature.settings.ui.UiOptionDialog
-import com.grappim.aipal.android.uikit.PlatoTopBar
+import com.grappim.aipal.widgets.PlatoTextButton
+import com.grappim.aipal.widgets.PlatoTopBar
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -42,10 +43,10 @@ fun SettingsRoute(
 
         Column(
             modifier =
-                Modifier
-                    .padding(paddingValues)
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+            Modifier
+                .padding(paddingValues)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
         ) {
             Button(onClick = { context.startActivity(ttsIntent) }) {
                 Text(text = "Setup TTS")
@@ -61,12 +62,8 @@ fun SettingsRoute(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Button(onClick = goToAiSettings) {
-                Text(text = "AI Settings")
-            }
-            Button(onClick = { state.onShowUiSettings(true) }) {
-                Text(text = "UI Settings")
-            }
+            PlatoTextButton(text = "AI Settings", onClick = goToAiSettings)
+            PlatoTextButton(text = "UI Settings", onClick = { state.onShowUiSettings(true) })
         }
     }
 }
