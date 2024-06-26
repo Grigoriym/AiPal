@@ -19,7 +19,6 @@ class SettingsViewModel(
         MutableStateFlow(
             SettingsState(
                 onBehaviorValueChange = ::updateBehavior,
-                onSetBehavior = ::setBehavior,
                 onDarkThemeConfigClicked = ::onDarkThemeConfigClicked,
                 onShowUiSettings = ::showUiSettings,
             ),
@@ -50,11 +49,5 @@ class SettingsViewModel(
 
     private fun updateBehavior(text: String) {
         _state.update { it.copy(behavior = text) }
-    }
-
-    private fun setBehavior() {
-        viewModelScope.launch {
-            aiPalRepo.setBehavior(state.value.behavior)
-        }
     }
 }

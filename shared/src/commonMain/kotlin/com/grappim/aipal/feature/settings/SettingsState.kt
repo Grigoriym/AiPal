@@ -6,7 +6,6 @@ import com.grappim.aipal.data.model.DarkThemeConfig
 data class SettingsState(
     val behavior: String = DEFAULT_BEHAVIOR,
     val onBehaviorValueChange: (String) -> Unit,
-    val onSetBehavior: () -> Unit,
     val onDarkThemeConfigClicked: (DarkThemeConfig) -> Unit,
     val darkThemeConfig: DarkThemeConfig = DarkThemeConfig.default(),
     val isUiSettingsVisible: Boolean = false,

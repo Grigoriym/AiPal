@@ -13,7 +13,6 @@ import com.grappim.aipal.data.local.LocalDataStorage
 import com.grappim.aipal.data.model.Message
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
@@ -24,7 +23,6 @@ import org.lighthousegames.logging.logging
 class AiPalRepoImpl(
     private val localDataStorage: LocalDataStorage,
 ) : AiPalRepo {
-
     private val messages = mutableListOf<Message>()
 
     private val log = logging()
@@ -36,9 +34,9 @@ class AiPalRepoImpl(
                 OpenAI(
                     token = value,
                     logging =
-                    LoggingConfig(
-                        logLevel = LogLevel.All,
-                    ),
+                        LoggingConfig(
+                            logLevel = LogLevel.All,
+                        ),
                 )
             }
 
@@ -52,18 +50,19 @@ class AiPalRepoImpl(
         withContext(Dispatchers.IO) {
             try {
                 val service = getOpenAi() ?: throw OpenAiEmptyApiKeyException()
-                val chatCompletionRequest = createChatCompletionRequest(
-                    listOf(
-                        ChatMessage(
-                            role = Role.System,
-                            content = localDataStorage.translationPrompt.first(),
-                        ),
-                        ChatMessage(
-                            role = Role.User,
-                            content = "\"$msg\"",
+                val chatCompletionRequest =
+                    createChatCompletionRequest(
+                        listOf(
+                            ChatMessage(
+                                role = Role.System,
+                                content = localDataStorage.translationPrompt.first(),
+                            ),
+                            ChatMessage(
+                                role = Role.User,
+                                content = "\"$msg\"",
+                            ),
                         ),
                     )
-                )
                 val completion = service.chatCompletion(chatCompletionRequest)
                 val receivedMessage =
                     completion.choices
@@ -102,16 +101,17 @@ class AiPalRepoImpl(
     override suspend fun sendMessage(msg: String): Result<String> =
         withContext(Dispatchers.IO) {
             try {
-                messages.add(Message(msg, Role.User))
                 val service = getOpenAi() ?: throw OpenAiEmptyApiKeyException()
-                val chatCompletionRequest = createChatCompletionRequest(
-                    messages.map {
-                        ChatMessage(
-                            role = it.role,
-                            content = it.text,
-                        )
-                    },
-                )
+                messages.add(Message(msg, Role.User))
+                val chatCompletionRequest =
+                    createChatCompletionRequest(
+                        messages.map {
+                            ChatMessage(
+                                role = it.role,
+                                content = it.text,
+                            )
+                        },
+                    )
                 val completion = service.chatCompletion(chatCompletionRequest)
                 val receivedMessage =
                     completion.choices
@@ -128,12 +128,10 @@ class AiPalRepoImpl(
             }
         }
 
-    private suspend fun createChatCompletionRequest(
-        messages: List<ChatMessage>
-    ): ChatCompletionRequest =
+    private suspend fun createChatCompletionRequest(messages: List<ChatMessage>): ChatCompletionRequest =
         ChatCompletionRequest(
             temperature = localDataStorage.tempFlow.first(),
             model = ModelId(localDataStorage.currentGptModel.first()),
-            messages = messages
+            messages = messages,
         )
 }

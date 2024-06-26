@@ -49,7 +49,7 @@ fun PromptsRoute(viewModel: PromptsViewModel = koinViewModel(), onBack: () -> Un
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(text = "Translation Prompt sets the message when we want to translate a message")
+            Text(text = "Translation Prompt sets the message which is sent upon translating the text")
             Spacer(modifier = Modifier.height(6.dp))
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
