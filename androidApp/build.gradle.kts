@@ -10,10 +10,11 @@ android {
     compileSdk = 34
     defaultConfig {
         applicationId = "com.grappim.aipal.android"
+        testApplicationId = "com.grappim.aipal.android.test"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.0.1"
     }
     buildFeatures {
         compose = true
@@ -24,9 +25,31 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    signingConfigs {
+        create("release") {
+            storeFile = file("../androidApp/aipal_key.jks")
+            keyAlias = System.getenv("AIPAL_ALIAS_R")
+            keyPassword = System.getenv("AIPAL_KEY_PASS_R")
+            storePassword = System.getenv("AIPAL_STORE_PASS_R")
+            enableV2Signing = true
+            enableV3Signing = true
+        }
+    }
     buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
+        debug {
+            applicationIdSuffix = ".debug"
+
+            signingConfig = signingConfigs.getByName("debug")
+        }
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {

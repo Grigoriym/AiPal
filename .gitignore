@@ -9,3 +9,5 @@ captures
 local.properties
 xcuserdata
 .kotlin
+/androidApp/release
+/androidApp/aipal_key.jks
