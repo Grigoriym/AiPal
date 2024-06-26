@@ -1,10 +1,9 @@
 ## WTF is this
 Your personal AI pal to learn speaking a language.
 You only need your OpenAI api token (can be set in Settings) and you are ready to go.
-Since TTS stuff is done by your default TTS engine on a smartphone, don't forget to set it up correctly for your language (you can do that in the app)
 
 ## How does it work?
-1. The TTS is done with your phone default TTS-engine, so any settings are done there, not on my side
+1. The TTS is done with your phone default TTS-engine, so any settings are done there, not on my side. But you still need check it before using the app.
 2. The STT is done with the help of a speech recognition tool [Vosk](https://alphacephei.com/vosk/). 
    So the SST is done on your device with a small 45 MB file which does all the work
 3. The OpenAI chat gpt is used right now.
