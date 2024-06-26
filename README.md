@@ -1,6 +1,7 @@
 ## WTF is this
 Your personal AI pal to learn speaking a language.
 You only need your OpenAI api token (can be set in Settings) and you are ready to go.
+Since TTS stuff is done by your default TTS engine on a smartphone, don't forget to set it up correctly for your language (you can do that in the app)
 
 ## How does it work?
 1. The TTS is done with your phone default TTS-engine, so any settings are done there, not on my side
