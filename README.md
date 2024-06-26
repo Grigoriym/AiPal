@@ -36,3 +36,4 @@ https://github.com/Marc-JB/TextToSpeechKt?tab=readme-ov-file
 
 https://github.com/paulotaylor/klaude
 https://github.com/tddworks/openai-kotlin
+https://github.com/JustAmalll/Translator_KMM
