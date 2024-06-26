@@ -15,7 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.grappim.aipal.android.uikit.PlatoTopBar
+import com.grappim.aipal.widgets.PlatoTopBar
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

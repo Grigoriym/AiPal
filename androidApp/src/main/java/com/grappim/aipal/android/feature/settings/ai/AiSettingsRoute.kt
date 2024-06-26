@@ -28,7 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.grappim.aipal.android.uikit.PlatoTopBar
+import com.grappim.aipal.widgets.PlatoTopBar
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -49,15 +49,15 @@ fun AiSettingsRoute(
     ) { padding ->
         Column(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(padding)
-                    .padding(16.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(padding)
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 modifier =
-                    Modifier.fillMaxWidth(),
+                Modifier.fillMaxWidth(),
                 text = "Temperature: ${state.tempValue}",
                 textAlign = TextAlign.Center,
             )
@@ -113,9 +113,9 @@ fun DynamicSelectTextField(
     ) {
         OutlinedTextField(
             modifier =
-                Modifier
-                    .menuAnchor()
-                    .fillMaxWidth(),
+            Modifier
+                .menuAnchor()
+                .fillMaxWidth(),
             readOnly = true,
             value = selectedValue,
             onValueChange = {},
