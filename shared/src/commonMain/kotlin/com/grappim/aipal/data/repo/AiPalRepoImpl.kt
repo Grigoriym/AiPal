@@ -1,4 +1,4 @@
-package com.grappim.aipal.android.data.repo
+package com.grappim.aipal.data.repo
 
 import com.aallam.openai.api.chat.ChatCompletionRequest
 import com.aallam.openai.api.chat.ChatMessage
@@ -7,13 +7,13 @@ import com.aallam.openai.api.logging.LogLevel
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.LoggingConfig
 import com.aallam.openai.client.OpenAI
-import com.grappim.aipal.data.model.Message
 import com.grappim.aipal.core.DEFAULT_BEHAVIOR
-import com.grappim.aipal.data.local.LocalDataStorage
 import com.grappim.aipal.data.exceptions.OpenAiEmptyApiKeyException
-import com.grappim.aipal.data.repo.AiPalRepo
+import com.grappim.aipal.data.local.LocalDataStorage
+import com.grappim.aipal.data.model.Message
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull

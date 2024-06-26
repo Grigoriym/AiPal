@@ -1,8 +1,8 @@
 package com.grappim.aipal.core
 
-import java.time.Instant
+import kotlinx.datetime.Clock
 
 data class LaunchedEffectResult<T>(
     val data: T,
-    val timestamp: Long = Instant.now().toEpochMilli()
+    val timestamp: Long = Clock.System.now().toEpochMilliseconds()
 )

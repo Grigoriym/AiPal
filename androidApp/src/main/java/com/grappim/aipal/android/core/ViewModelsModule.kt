@@ -5,7 +5,7 @@ import com.grappim.aipal.android.feature.prompts.PromptsViewModel
 import com.grappim.aipal.android.feature.settings.SettingsViewModel
 import com.grappim.aipal.android.feature.settings.ai.AiSettingsViewModel
 import com.grappim.aipal.android.feature.settings.apiKeys.ApiKeysViewModel
-import com.grappim.aipal.android.recognition.RecognitionManager
+import com.grappim.aipal.android.recognition.AndroidRecognitionManager
 import com.grappim.aipal.android.recognition.RecognitionModelRetriever
 import com.grappim.aipal.android.root.MainViewModel
 import com.grappim.aipal.data.local.LocalDataStorage
@@ -17,7 +17,7 @@ val viewModelsModule = module {
     viewModel {
         ChatViewModel(
             get<AiPalRepo>(),
-            get<RecognitionManager>(),
+            get<AndroidRecognitionManager>(),
             get<RecognitionModelRetriever>(),
         )
     }

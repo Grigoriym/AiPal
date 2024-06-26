@@ -1,20 +1,18 @@
 package com.grappim.aipal.android.recognition
 
+import com.grappim.aipal.data.recognition.RecognitionManager
+import com.grappim.aipal.data.recognition.RecognitionState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import org.vosk.android.RecognitionListener
 
-interface RecognitionManager : RecognitionListener {
-    val state: StateFlow<RecognitionState>
-
-    fun timeoutHandled()
-}
+interface AndroidRecognitionManager : RecognitionManager, RecognitionListener
 
 class RecognitionManagerImpl(
     private val recognitionMessageDecoder: RecognitionMessageDecoder,
-) : RecognitionManager {
+) : AndroidRecognitionManager {
     private val _state = MutableStateFlow(RecognitionState())
 
     override val state: StateFlow<RecognitionState> = _state.asStateFlow()
@@ -45,9 +43,5 @@ class RecognitionManagerImpl(
 
     override fun onTimeout() {
         _state.update { it.copy(isTimeout = true) }
-    }
-
-    override fun timeoutHandled() {
-        _state.update { it.copy(isTimeout = false) }
     }
 }

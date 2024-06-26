@@ -1,5 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
@@ -32,13 +32,13 @@ kotlin {
 //        }
 //        binaries.executable()
 //    }
-//
+
 //    js {
 //        browser()
 //        binaries.executable()
 //    }
-//
-//    jvm("desktop")
+
+    jvm("desktop")
 
 //    listOf(
 //        iosX64(),
@@ -52,16 +52,20 @@ kotlin {
 //    }
 
     sourceSets {
-//        val desktopMain by getting
-//        desktopMain.dependencies {
-//            implementation(compose.desktop.currentOs)
-//        }
         commonMain.dependencies {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
 
+            implementation(libs.kotlinx.serialization)
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.datetime)
+
+            implementation(libs.uuid)
+            implementation(libs.voyager)
             api(libs.logging)
+
+            api(libs.androidx.datastore.preferences.core)
+            implementation(libs.kotlinx.atomicfu)
 
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -71,13 +75,13 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(compose.materialIconsExtended)
 
-            implementation(libs.voyager)
-
-            implementation(libs.kotlinx.serialization)
-
             implementation(project.dependencies.platform(libs.openai.client.bom))
             implementation(libs.openai.client)
             runtimeOnly(libs.ktor.client.okhttp)
+
+            // Temporarily added so that with ios the project can be built
+            // https://github.com/cashapp/sqldelight/issues/4357#issuecomment-1839905700
+            implementation(libs.stately.common)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -86,6 +90,10 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
+        }
+        val desktopMain by getting
+        desktopMain.dependencies {
+            implementation(compose.desktop.currentOs)
         }
     }
 }

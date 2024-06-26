@@ -1,6 +1,4 @@
-package com.grappim.aipal.android.recognition
-
-import java.lang.Exception
+package com.grappim.aipal.data.recognition
 
 data class RecognitionState(
     val exception: Exception? = null,

@@ -2,23 +2,33 @@
 koin = "3.5.6"
 koin-compose-multiplatform = "1.1.5"
 
+kotlin = "2.0.0"
+kotlin-serialization = "1.6.3"
+kotlinxDatetime = "0.6.0"
+kotlinxCoroutines = "1.8.0"
+atomicfu = "0.24.0"
+
+statelyCommon = "2.0.5"
+uuid = "0.8.4"
 voyager = "1.1.0-beta02"
 
-compose-bom = "2024.06.00"
 agp = "8.5.0"
-kotlin = "2.0.0"
+
+datastore-prefs = "1.1.1"
+
+compose-bom = "2024.06.00"
 compose = "1.5.4"
 compose-material3 = "1.1.2"
 androidx-activityCompose = "1.8.0"
-kotlinxCoroutines = "1.8.0"
+androidDesugarJdkLibs = "2.0.4"
+navigation = "2.7.7"
+
+accompanist = "0.34.0"
+
 openaiClientBom = "3.8.1"
 tts = "2.5.0"
 vosk = "0.3.47"
-accompanist = "0.34.0"
-kotlin-serialization = "1.6.3"
-navigation = "2.7.7"
-androidDesugarJdkLibs = "2.0.4"
-datastore-prefs = "1.1.1"
+
 logging = "1.5.0"
 ksp = "2.0.0-1.0.22"
 compose-plugin = "1.6.11"
@@ -29,11 +39,22 @@ koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin-com
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
 
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
+kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
+
+stately-common = { module = "co.touchlab:stately-common", version.ref = "statelyCommon" }
+uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 voyager = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
 
-androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+androidx-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "datastore-prefs" }
+androidx-datastore-prefs = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore-prefs" }
+
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+
+androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
 compose-ui = { module = "androidx.compose.ui:ui" }
 androidx-compose-material-core = { module = "androidx.compose.material:material" }
 androidx-compose-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
@@ -42,7 +63,7 @@ compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 compose-foundation = { module = "androidx.compose.foundation:foundation" }
 compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "compose-material3" }
-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
+
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp" }
 openai-client = { module = "com.aallam.openai:openai-client" }
 openai-client-bom = { module = "com.aallam.openai:openai-client-bom", version.ref = "openaiClientBom" }
@@ -50,10 +71,8 @@ tts = { module = "nl.marc-apps:tts", version.ref = "tts" }
 tts-compose = { module = "nl.marc-apps:tts-compose", version.ref = "tts" }
 voskAndroid = { module = "com.alphacephei:vosk-android", version.ref = "vosk" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
-kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
-androidx-datastore-prefs = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore-prefs" }
 logging = { module = "org.lighthousegames:logging", version.ref = "logging" }
 
 [plugins]

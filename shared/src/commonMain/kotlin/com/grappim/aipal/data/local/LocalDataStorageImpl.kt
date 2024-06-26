@@ -1,4 +1,4 @@
-package com.grappim.aipal.android.data.local
+package com.grappim.aipal.data.local
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -10,7 +10,6 @@ import com.grappim.aipal.core.DEFAULT_BEHAVIOR
 import com.grappim.aipal.core.DEFAULT_MODEL
 import com.grappim.aipal.core.DEFAULT_TEMPERATURE
 import com.grappim.aipal.core.DEFAULT_TRANSLATION_PROMPT
-import com.grappim.aipal.data.local.LocalDataStorage
 import com.grappim.aipal.data.model.DarkThemeConfig
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

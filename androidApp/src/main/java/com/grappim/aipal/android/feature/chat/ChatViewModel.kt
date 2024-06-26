@@ -5,7 +5,7 @@ import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.grappim.aipal.android.recognition.RecognitionManager
+import com.grappim.aipal.android.recognition.AndroidRecognitionManager
 import com.grappim.aipal.android.recognition.RecognitionModelRetriever
 import com.grappim.aipal.core.LaunchedEffectResult
 import com.grappim.aipal.data.exceptions.OpenAiEmptyApiKeyException
@@ -26,7 +26,7 @@ import org.vosk.android.SpeechService
 
 class ChatViewModel(
     private val aiPalRepo: AiPalRepo,
-    private val recognitionManager: RecognitionManager,
+    private val recognitionManager: AndroidRecognitionManager,
     private val recognitionModelRetriever: RecognitionModelRetriever,
 ) : ViewModel() {
     private val _state = MutableStateFlow(

@@ -1,25 +1,9 @@
-import java.util.Properties
-
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
 }
-
-fun readProperties(propertiesFile: File): Properties {
-    val properties = Properties()
-    propertiesFile.inputStream().use { fis ->
-        properties.load(fis)
-    }
-    return properties
-}
-
-val appPropertiesFile = File("./local.properties")
-val appProperties = readProperties(appPropertiesFile)
-
-val openAiApiKey = appProperties.getProperty("openAiApiKey")
-val openAiOrganizationId = appProperties.getProperty("openAiOrganizationId")
 
 android {
     namespace = "com.grappim.aipal.android"
@@ -84,4 +68,6 @@ dependencies {
     implementation(libs.tts.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.datastore.prefs)
+
+    implementation(libs.kotlinx.datetime)
 }
