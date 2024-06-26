@@ -13,30 +13,31 @@ import com.grappim.aipal.data.repo.AiPalRepo
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
-val viewModelsModule = module {
-    viewModel {
-        ChatViewModel(
-            get<AiPalRepo>(),
-            get<AndroidRecognitionManager>(),
-            get<RecognitionModelRetriever>(),
-        )
+val viewModelsModule =
+    module {
+        viewModel {
+            ChatViewModel(
+                get<AiPalRepo>(),
+                get<AndroidRecognitionManager>(),
+                get<RecognitionModelRetriever>(),
+            )
+        }
+        viewModel {
+            SettingsViewModel(
+                get<AiPalRepo>(),
+                get<LocalDataStorage>(),
+            )
+        }
+        viewModel {
+            MainViewModel(get<LocalDataStorage>())
+        }
+        viewModel {
+            PromptsViewModel(get<LocalDataStorage>(), get<AiPalRepo>())
+        }
+        viewModel {
+            ApiKeysViewModel(get<LocalDataStorage>(), get<AiPalRepo>())
+        }
+        viewModel {
+            AiSettingsViewModel(get<LocalDataStorage>(), get<AiPalRepo>())
+        }
     }
-    viewModel {
-        SettingsViewModel(
-            get<AiPalRepo>(),
-            get<LocalDataStorage>(),
-        )
-    }
-    viewModel {
-        MainViewModel(get<LocalDataStorage>())
-    }
-    viewModel {
-        PromptsViewModel(get<LocalDataStorage>())
-    }
-    viewModel {
-        ApiKeysViewModel(get<LocalDataStorage>(), get<AiPalRepo>())
-    }
-    viewModel {
-        AiSettingsViewModel(get<LocalDataStorage>(), get<AiPalRepo>())
-    }
-}
