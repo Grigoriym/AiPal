@@ -22,4 +22,11 @@
             </intent-filter>
         </activity>
     </application>
+
+    <!--    Needed for SpeechRecognizer-->
+    <queries>
+        <intent>
+            <action android:name="android. speech. RecognitionService" />
+        </intent>
+    </queries>
 </manifest> 

@@ -1,12 +1,12 @@
 package com.grappim.aipal.android.core
 
 import com.grappim.aipal.android.feature.chat.ChatViewModel
+import com.grappim.aipal.android.feature.language.SstSettingsViewModel
 import com.grappim.aipal.android.feature.prompts.PromptsViewModel
 import com.grappim.aipal.android.feature.settings.SettingsViewModel
 import com.grappim.aipal.android.feature.settings.ai.AiSettingsViewModel
 import com.grappim.aipal.android.feature.settings.apiKeys.ApiKeysViewModel
-import com.grappim.aipal.android.recognition.AndroidRecognitionManager
-import com.grappim.aipal.android.recognition.RecognitionModelRetriever
+import com.grappim.aipal.android.recognition.factory.SSTFactory
 import com.grappim.aipal.android.root.MainViewModel
 import com.grappim.aipal.data.local.LocalDataStorage
 import com.grappim.aipal.data.repo.AiPalRepo
@@ -18,13 +18,12 @@ val viewModelsModule =
         viewModel {
             ChatViewModel(
                 get<AiPalRepo>(),
-                get<AndroidRecognitionManager>(),
-                get<RecognitionModelRetriever>(),
+                get<LocalDataStorage>(),
+                get<SSTFactory>(),
             )
         }
         viewModel {
             SettingsViewModel(
-                get<AiPalRepo>(),
                 get<LocalDataStorage>(),
             )
         }
@@ -39,5 +38,8 @@ val viewModelsModule =
         }
         viewModel {
             AiSettingsViewModel(get<LocalDataStorage>(), get<AiPalRepo>())
+        }
+        viewModel {
+            SstSettingsViewModel(get<LocalDataStorage>())
         }
     }

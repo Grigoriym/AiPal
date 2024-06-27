@@ -38,4 +38,6 @@ https://github.com/paulotaylor/klaude
 https://github.com/tddworks/openai-kotlin
 https://github.com/JustAmalll/Translator_KMM
 
+https://github.com/ndenicolais/SpeechAndText.git
+
 https://stackoverflow.com/questions/38675829/how-to-create-releases-for-public-or-private-repository-in-github
