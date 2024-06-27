@@ -5,10 +5,18 @@ You only need your OpenAI api token (can be set in Settings) and you are ready t
 ## How does it work?
 1. The TTS is done with your phone default TTS-engine, so any settings are done there, not on my side. But you still need check it before using the app.
 2. The STT is done with the help of a speech recognition tool [Vosk](https://alphacephei.com/vosk/). 
-   So the SST is done on your device with a small 45 MB file which does all the work
+   So the SST is done on your device with a small 45 MB file which does all the work.
+   NOw you can choose between the default one and Vosk
 3. The OpenAI chat gpt is used right now.
 4. Only German language is supported for now, though it is not a problem to add other possible languages.
     If Vosk supports a language, it can be done.
+
+## Android or Vosk SST?
+1. Android is not continuous (it is interrupted when you stop speaking), requires internet connection,
+    from my experience is more accurate than Vosk (and it is understandable),
+    can capitalize words (everything that is capitalized in German)
+2. Vosk is continuous (you decide when to stop and when to start speaking), 
+    does not require internet connection
 
 ## Roadmap
 0. Make it available to copy the chat card text. I believe I need to add a copy button to client messages as well.
