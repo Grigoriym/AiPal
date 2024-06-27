@@ -69,11 +69,12 @@ openai-client = { module = "com.aallam.openai:openai-client" }
 openai-client-bom = { module = "com.aallam.openai:openai-client-bom", version.ref = "openaiClientBom" }
 tts = { module = "nl.marc-apps:tts", version.ref = "tts" }
 tts-compose = { module = "nl.marc-apps:tts-compose", version.ref = "tts" }
-voskAndroid = { module = "com.alphacephei:vosk-android", version.ref = "vosk" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
 logging = { module = "org.lighthousegames:logging", version.ref = "logging" }
+
+voskAndroid = { module = "com.alphacephei:vosk-android", version.ref = "vosk" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

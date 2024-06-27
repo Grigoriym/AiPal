@@ -14,7 +14,11 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 1
-        versionName = "0.0.1"
+        versionName = "0.0.3"
+
+        ndk {
+            abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86_64", "x86"))
+        }
     }
     buildFeatures {
         compose = true
@@ -47,7 +51,7 @@ android {
 
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
             signingConfig = signingConfigs.getByName("release")
         }
@@ -84,7 +88,11 @@ dependencies {
     implementation(libs.koin.compose)
     implementation(libs.koin.androidx.compose)
 
-    implementation(libs.voskAndroid)
+    implementation("net.java.dev.jna:jna:5.14.0@aar")
+    implementation(libs.voskAndroid) {
+        exclude(group = "net.java.dev.jna", module = "jna")
+    }
+
     implementation(libs.accompanist.permissions)
 
     implementation(libs.tts)
