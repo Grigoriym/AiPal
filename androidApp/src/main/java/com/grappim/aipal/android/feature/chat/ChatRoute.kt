@@ -210,6 +210,7 @@ private fun ChatItem(
             }
         }
         Card(
+            modifier = Modifier.weight(1f),
             shape =
             RoundedCornerShape(
                 topStart = 24f,
