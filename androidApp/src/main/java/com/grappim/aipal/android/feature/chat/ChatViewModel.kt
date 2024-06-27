@@ -17,6 +17,7 @@ import com.grappim.aipal.feature.chat.ChatState
 import com.grappim.aipal.feature.chat.SnackbarData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.lighthousegames.logging.logging
@@ -44,9 +45,11 @@ class ChatViewModel(
     init {
         viewModelScope.launch {
             launch {
-                localDataStorage.sstManager.collect { value ->
-                    updateSSTManager(value)
-                }
+                localDataStorage.sstManager
+                    .distinctUntilChanged()
+                    .collect { value ->
+                        updateSSTManager(value)
+                    }
             }
         }
     }
