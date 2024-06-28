@@ -49,7 +49,7 @@ class VoskSSTManager(
     private fun startRecognizer() {
         val rec = Recognizer(model, 16000.0f)
         speechService = SpeechService(rec, 16000.0f)
-        speechService?.startListening(this)
+        requireNotNull(speechService).startListening(this)
 
         _state.update { it.copy(isSpeaking = true) }
     }
@@ -66,6 +66,7 @@ class VoskSSTManager(
 
     override fun cancel() {
         speechService?.cancel()
+        speechService = null
     }
 
     /**
