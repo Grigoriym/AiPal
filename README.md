@@ -5,16 +5,18 @@ You only need your OpenAI api token (can be set in Settings) and you are ready t
 ## How does it work?
 1. The TTS is done with your phone default TTS-engine, so any settings are done there, not on my side. But you still need check it before using the app.
 2. The STT is done with the help of a speech recognition tool [Vosk](https://alphacephei.com/vosk/). 
-   So the SST is done on your device with a small 45 MB file which does all the work
+   So the SST is done on your device with a small 80 MB file which does all the work
 3. The OpenAI chat gpt is used right now.
 4. Only German language is supported for now, though it is not a problem to add other possible languages.
     If Vosk supports a language, it can be done.
 
 ## Roadmap
-0. Make it available to copy the chat card text. I believe I need to add a copy button to client messages as well.
+0. ~~Make it available to copy the chat card text. I believe I need to add a copy button to client messages as well.~~
 1. Local history of conversations
 2. Connecting to your own server (like running ollama on your machine and creating a simple intermediary to connect to)
 3. Other AIs (like Claude, Mixtral, ...) (maybe, do not see the reason for now)
+4. SST chooser (WIP)
+5. Language Chooser (WIP)
 
 ## Helpful projects
 https://github.com/aallam/openai-kotlin
