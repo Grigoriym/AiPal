@@ -2,6 +2,9 @@
 Your personal AI pal to learn speaking a language.
 You only need your OpenAI api token (can be set in Settings) and you are ready to go.
 
+<img src="https://github.com/Grigoriym/AiPal/assets/31949421/380503c1-c4cf-42f1-9d2d-88ef162bb90b"  width="300" height="600">
+
+
 ## How does it work?
 1. The TTS is done with your phone default TTS-engine, so any settings are done there, not on my side. But you still need check it before using the app.
 2. The STT is done with the help of a speech recognition tool [Vosk](https://alphacephei.com/vosk/). 
