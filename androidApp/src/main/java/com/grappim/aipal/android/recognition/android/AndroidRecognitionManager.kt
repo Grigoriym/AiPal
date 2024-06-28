@@ -38,7 +38,7 @@ class AndroidSSTManager(
             return
         }
 
-        val languageCode = localDataStorage.currentLanguage.first()
+        val languageCode = localDataStorage.currentLanguage.first().lang
         logging.d { "languageCode: $languageCode" }
 
         val intent =

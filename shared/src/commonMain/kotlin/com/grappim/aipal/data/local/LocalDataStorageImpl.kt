@@ -7,10 +7,10 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.grappim.aipal.core.DEFAULT_BEHAVIOR
-import com.grappim.aipal.core.DEFAULT_LANGUAGE
 import com.grappim.aipal.core.DEFAULT_MODEL
 import com.grappim.aipal.core.DEFAULT_TEMPERATURE
 import com.grappim.aipal.core.DEFAULT_TRANSLATION_PROMPT
+import com.grappim.aipal.core.SupportedLanguage
 import com.grappim.aipal.data.model.DarkThemeConfig
 import com.grappim.aipal.data.recognition.CurrentSSTManager
 import kotlinx.coroutines.flow.Flow
@@ -37,9 +37,11 @@ class LocalDataStorageImpl(
             }
 
     private val currentLanguageKey = stringPreferencesKey("language_key")
-    override val currentLanguage: Flow<String> =
+    override val currentLanguage: Flow<SupportedLanguage> =
         dataStore.data.map { value: Preferences ->
-            value[currentLanguageKey] ?: DEFAULT_LANGUAGE
+            SupportedLanguage.valueOf(
+                value[currentLanguageKey] ?: SupportedLanguage.getDefault().name,
+            )
         }
 
     private val openAiApiKeyKey = stringPreferencesKey("open_ai_api_key_key")
@@ -123,9 +125,9 @@ class LocalDataStorageImpl(
         }
     }
 
-    override suspend fun setCurrentLanguage(language: String) {
+    override suspend fun setCurrentLanguage(language: SupportedLanguage) {
         dataStore.edit { settings ->
-            settings[currentLanguageKey] = language
+            settings[currentLanguageKey] = language.name
         }
     }
 

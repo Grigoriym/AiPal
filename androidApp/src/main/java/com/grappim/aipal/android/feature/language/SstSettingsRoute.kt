@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.grappim.aipal.android.feature.settings.ai.DynamicSelectTextField
 import com.grappim.aipal.data.recognition.CurrentSSTManager
 import com.grappim.aipal.widgets.PlatoTopBar
 import org.koin.androidx.compose.koinViewModel
@@ -40,9 +41,24 @@ fun SstSettingsRoute(
                     .padding(horizontal = 16.dp)
                     .fillMaxWidth(),
         ) {
+            LanguageChooser(state)
+            Spacer(modifier = Modifier.height(16.dp))
             SstManagerChooser(state)
         }
     }
+}
+
+@Composable
+private fun LanguageChooser(state: SstSettingsState) {
+    Text(text = "Here you can choose the language to work with")
+    Spacer(modifier = Modifier.height(6.dp))
+
+    DynamicSelectTextField(
+        selectedValue = state.currentLanguage.title,
+        options = state.languages,
+        label = "Language",
+        onValueChangedEvent = state.onSetCurrentLanguage,
+    )
 }
 
 @Composable
