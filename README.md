@@ -2,6 +2,7 @@
 1. Your personal AI pal to learn speaking a language.
 2. You only need your OpenAI api token (can be set in Settings) and you are ready to go.
 3. Please set the TTS engine to the German language in Settings, otherwise you will be listening german with {you_language} pronunciation
+4. You can set any OpenAi model you like, and the needed temperature
 
 <img src="https://github.com/Grigoriym/AiPal/assets/31949421/380503c1-c4cf-42f1-9d2d-88ef162bb90b"  width="300" height="600">
 
