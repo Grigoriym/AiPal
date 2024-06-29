@@ -9,7 +9,7 @@ import com.grappim.aipal.android.recognition.factory.SSTFactory
 import com.grappim.aipal.core.LaunchedEffectResult
 import com.grappim.aipal.data.exceptions.OpenAiEmptyApiKeyException
 import com.grappim.aipal.data.local.LocalDataStorage
-import com.grappim.aipal.data.recognition.CurrentSSTManager
+import com.grappim.aipal.data.recognition.CurrentSTTManager
 import com.grappim.aipal.data.recognition.STTManager
 import com.grappim.aipal.data.repo.AiPalRepo
 import com.grappim.aipal.feature.chat.ChatMessageUI
@@ -27,7 +27,7 @@ class ChatViewModel(
     private val localDataStorage: LocalDataStorage,
     private val sstFactory: SSTFactory,
 ) : ViewModel() {
-    private var sstManager: STTManager = sstFactory.getSSTManager(CurrentSSTManager.default())
+    private var sstManager: STTManager = sstFactory.getSSTManager(CurrentSTTManager.default())
 
     private val _state =
         MutableStateFlow(
@@ -45,7 +45,7 @@ class ChatViewModel(
     init {
         viewModelScope.launch {
             launch {
-                localDataStorage.sstManager
+                localDataStorage.sttManager
                     .distinctUntilChanged()
                     .collect { value ->
                         updateSSTManager(value)
@@ -54,7 +54,7 @@ class ChatViewModel(
         }
     }
 
-    private fun updateSSTManager(newManger: CurrentSSTManager) {
+    private fun updateSSTManager(newManger: CurrentSTTManager) {
         viewModelScope.launch {
             sstManager.cancel()
             sstManager = sstFactory.getSSTManager(newManger)

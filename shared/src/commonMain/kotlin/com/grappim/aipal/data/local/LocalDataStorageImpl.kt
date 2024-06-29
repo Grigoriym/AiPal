@@ -12,7 +12,7 @@ import com.grappim.aipal.core.DEFAULT_TEMPERATURE
 import com.grappim.aipal.core.DEFAULT_TRANSLATION_PROMPT
 import com.grappim.aipal.core.SupportedLanguage
 import com.grappim.aipal.data.model.DarkThemeConfig
-import com.grappim.aipal.data.recognition.CurrentSSTManager
+import com.grappim.aipal.data.recognition.CurrentSTTManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -30,10 +30,10 @@ class LocalDataStorageImpl(
             }
 
     private val sstManagerKey = stringPreferencesKey("sst_manager_key")
-    override val sstManager: Flow<CurrentSSTManager> =
+    override val sttManager: Flow<CurrentSTTManager> =
         dataStore.data
             .map { value: Preferences ->
-                CurrentSSTManager.valueOf(value[sstManagerKey] ?: CurrentSSTManager.default().name)
+                CurrentSTTManager.valueOf(value[sstManagerKey] ?: CurrentSTTManager.default().name)
             }
 
     private val currentLanguageKey = stringPreferencesKey("language_key")
@@ -131,7 +131,7 @@ class LocalDataStorageImpl(
         }
     }
 
-    override suspend fun setSstManager(sstManager: CurrentSSTManager) {
+    override suspend fun setSttManager(sstManager: CurrentSTTManager) {
         dataStore.edit { settings ->
             settings[sstManagerKey] = sstManager.name
         }
