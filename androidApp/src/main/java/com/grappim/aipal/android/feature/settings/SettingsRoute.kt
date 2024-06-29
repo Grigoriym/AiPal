@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -28,7 +26,8 @@ fun SettingsRoute(
     onBack: () -> Unit,
     goToPrompts: () -> Unit,
     goToApiKeysSettings: () -> Unit,
-    goToAiSettings: () -> Unit
+    goToAiSettings: () -> Unit,
+    goToSstSettings: () -> Unit,
 ) {
     val context = LocalContext.current
     val ttsIntent by remember { mutableStateOf(Intent("com.android.settings.TTS_SETTINGS")) }
@@ -43,22 +42,15 @@ fun SettingsRoute(
 
         Column(
             modifier =
-            Modifier
-                .padding(paddingValues)
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                Modifier
+                    .padding(paddingValues)
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
         ) {
-            Button(onClick = { context.startActivity(ttsIntent) }) {
-                Text(text = "Setup TTS")
-            }
-
-            Button(onClick = goToPrompts) {
-                Text(text = "Setup Prompts")
-            }
-
-            Button(onClick = goToApiKeysSettings) {
-                Text(text = "Api Keys")
-            }
+            PlatoTextButton(text = "Setup TTS", onClick = { context.startActivity(ttsIntent) })
+            PlatoTextButton(text = "Setup SST", onClick = goToSstSettings)
+            PlatoTextButton(text = "Setup Prompts", onClick = goToPrompts)
+            PlatoTextButton(text = "Api Keys", onClick = goToApiKeysSettings)
 
             Spacer(modifier = Modifier.height(12.dp))
 

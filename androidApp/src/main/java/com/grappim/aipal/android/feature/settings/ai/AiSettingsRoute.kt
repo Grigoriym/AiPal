@@ -82,9 +82,7 @@ fun AiSettingsRoute(
                 selectedValue = state.selectedModel,
                 options = state.models,
                 label = "Model",
-                onValueChangedEvent = { value ->
-                    state.onSetModel(value)
-                },
+                onValueChangedEvent = state.onSetModel,
             )
             Spacer(modifier = Modifier.height(12.dp))
 
