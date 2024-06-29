@@ -2,7 +2,7 @@ package com.grappim.aipal.data.local
 
 import com.grappim.aipal.core.SupportedLanguage
 import com.grappim.aipal.data.model.DarkThemeConfig
-import com.grappim.aipal.data.recognition.CurrentSSTManager
+import com.grappim.aipal.data.recognition.CurrentSTTManager
 import kotlinx.coroutines.flow.Flow
 
 interface LocalDataStorage {
@@ -14,7 +14,7 @@ interface LocalDataStorage {
     val behavior: Flow<String>
     val openAiApiKey: Flow<String>
     val currentLanguage: Flow<SupportedLanguage>
-    val sstManager: Flow<CurrentSSTManager>
+    val sttManager: Flow<CurrentSTTManager>
 
     suspend fun setCurrentGptModel(model: String)
 
@@ -31,5 +31,5 @@ interface LocalDataStorage {
     suspend fun setOpenAiApiKey(key: String)
 
     suspend fun setCurrentLanguage(language: SupportedLanguage)
-    suspend fun setSstManager(sstManager: CurrentSSTManager)
+    suspend fun setSttManager(sstManager: CurrentSTTManager)
 }

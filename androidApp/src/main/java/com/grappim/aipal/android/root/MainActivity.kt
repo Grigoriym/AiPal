@@ -17,7 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.grappim.aipal.data.model.DarkThemeConfig
 import com.grappim.aipal.android.feature.chat.ChatRoute
-import com.grappim.aipal.android.feature.language.SstSettingsRoute
+import com.grappim.aipal.android.feature.stt.SttSettingsRoute
 import com.grappim.aipal.android.feature.prompts.PromptsRoute
 import com.grappim.aipal.android.feature.settings.SettingsRoute
 import com.grappim.aipal.android.feature.settings.ai.AiSettingsRoute
@@ -69,7 +69,7 @@ class MainActivity : ComponentActivity() {
                             }, goToAiSettings = {
                                 navController.navigate(NavDestinations.AiSettings.route)
                             }, goToSstSettings = {
-                                navController.navigate(NavDestinations.SstSettings.route)
+                                navController.navigate(NavDestinations.SttSettings.route)
                             })
                         }
                         composable(NavDestinations.Prompts.route) {
@@ -89,8 +89,8 @@ class MainActivity : ComponentActivity() {
                                 navController.popBackStack()
                             })
                         }
-                        composable(NavDestinations.SstSettings.route) {
-                            SstSettingsRoute(
+                        composable(NavDestinations.SttSettings.route) {
+                            SttSettingsRoute(
                                 onBack = {
                                     navController.popBackStack()
                                 }

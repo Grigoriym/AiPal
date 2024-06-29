@@ -1,7 +1,7 @@
 package com.grappim.aipal.android.core
 
 import com.grappim.aipal.android.feature.chat.ChatViewModel
-import com.grappim.aipal.android.feature.language.SstSettingsViewModel
+import com.grappim.aipal.android.feature.stt.SttSettingsViewModel
 import com.grappim.aipal.android.feature.prompts.PromptsViewModel
 import com.grappim.aipal.android.feature.settings.SettingsViewModel
 import com.grappim.aipal.android.feature.settings.ai.AiSettingsViewModel
@@ -40,6 +40,6 @@ val viewModelsModule =
             AiSettingsViewModel(get<LocalDataStorage>(), get<AiPalRepo>())
         }
         viewModel {
-            SstSettingsViewModel(get<LocalDataStorage>())
+            SttSettingsViewModel(get<LocalDataStorage>())
         }
     }

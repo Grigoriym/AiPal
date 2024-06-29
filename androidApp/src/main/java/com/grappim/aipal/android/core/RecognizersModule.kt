@@ -1,6 +1,10 @@
 package com.grappim.aipal.android.core
 
 import android.content.Context
+import com.grappim.aipal.android.files.download.FileDownloader
+import com.grappim.aipal.android.files.path.FolderPathManager
+import com.grappim.aipal.android.files.vosk.VoskModelCheck
+import com.grappim.aipal.android.files.zip.FileUnzipManager
 import com.grappim.aipal.android.recognition.android.AndroidSSTManager
 import com.grappim.aipal.android.recognition.android.SpeechRecognitionWrapper
 import com.grappim.aipal.android.recognition.android.SpeechRecognitionWrapperImpl
@@ -28,6 +32,11 @@ val recognizersModule =
             VoskSSTManager(
                 get<RecognitionMessageDecoder>(),
                 get<RecognitionModelRetriever>(),
+                get<LocalDataStorage>(),
+                get<FolderPathManager>(),
+                get<FileDownloader>(),
+                get<FileUnzipManager>(),
+                get<VoskModelCheck>()
             )
         }
         factory<RecognitionModelRetriever> { RecognitionModelRetrieverImpl(get<Context>()) }
