@@ -40,10 +40,6 @@ class AiPalRepoImpl(
                 )
             }
 
-    init {
-        setBehavior(DEFAULT_BEHAVIOR)
-    }
-
     private suspend fun getOpenAi(): OpenAI? = openAiFlow.firstOrNull()
 
     override suspend fun translateMessage(msg: String): Result<String> =

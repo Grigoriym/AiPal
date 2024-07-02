@@ -13,3 +13,4 @@ const val DEFAULT_TRANSLATION_PROMPT = "Translate the next message to English, "
 const val DEFAULT_LANGUAGE = "de"
 
 const val DEFAULT_VOSK_SAMPLE_RATE = 16000.0f
+const val SAMPLE_RATE = 44100.0f

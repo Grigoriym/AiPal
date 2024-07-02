@@ -5,6 +5,7 @@ import java.io.File
 interface FileUnzipManager {
     suspend fun unzip(
         zipFile: File,
-        destDirectory: File
+        destDirectory: File,
+        progressCallback: (progress: Int) -> Unit
     )
 }

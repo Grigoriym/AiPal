@@ -15,6 +15,7 @@ import com.grappim.aipal.data.model.DarkThemeConfig
 import com.grappim.aipal.data.recognition.CurrentSTTManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.lighthousegames.logging.logging
 
 class LocalDataStorageImpl(
     private val dataStore: DataStore<Preferences>,

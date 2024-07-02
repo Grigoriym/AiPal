@@ -1,19 +1,16 @@
 package com.grappim.aipal.android.core
 
 import android.content.Context
-import com.grappim.aipal.android.files.download.FileDownloader
 import com.grappim.aipal.android.files.path.FolderPathManager
+import com.grappim.aipal.android.files.vosk.ModelRetriever
 import com.grappim.aipal.android.files.vosk.VoskModelCheck
-import com.grappim.aipal.android.files.zip.FileUnzipManager
 import com.grappim.aipal.android.recognition.android.AndroidSSTManager
 import com.grappim.aipal.android.recognition.android.SpeechRecognitionWrapper
 import com.grappim.aipal.android.recognition.android.SpeechRecognitionWrapperImpl
-import com.grappim.aipal.android.recognition.factory.SSTFactory
+import com.grappim.aipal.android.recognition.factory.STTFactory
 import com.grappim.aipal.android.recognition.vosk.RecognitionMessageDecoder
 import com.grappim.aipal.android.recognition.vosk.RecognitionMessageDecoderImpl
-import com.grappim.aipal.android.recognition.vosk.RecognitionModelRetriever
-import com.grappim.aipal.android.recognition.vosk.RecognitionModelRetrieverImpl
-import com.grappim.aipal.android.recognition.vosk.VoskSSTManager
+import com.grappim.aipal.android.recognition.vosk.VoskSttManager
 import com.grappim.aipal.data.local.LocalDataStorage
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
@@ -26,21 +23,27 @@ val recognizersModule =
             SpeechRecognitionWrapperImpl(context)
         }
 
-        single { AndroidSSTManager(get<SpeechRecognitionWrapper>(), get<LocalDataStorage>()) }
-
-        single {
-            VoskSSTManager(
-                get<RecognitionMessageDecoder>(),
-                get<RecognitionModelRetriever>(),
-                get<LocalDataStorage>(),
-                get<FolderPathManager>(),
-                get<FileDownloader>(),
-                get<FileUnzipManager>(),
-                get<VoskModelCheck>()
-            )
-        }
-        factory<RecognitionModelRetriever> { RecognitionModelRetrieverImpl(get<Context>()) }
         factory<RecognitionMessageDecoder> { RecognitionMessageDecoderImpl(get<Json>()) }
 
-        single { SSTFactory(get(), get()) }
+        factory { AndroidSSTManager(get<SpeechRecognitionWrapper>(), get<LocalDataStorage>()) }
+        factory {
+            VoskSttManager(
+                get<RecognitionMessageDecoder>(),
+                get<LocalDataStorage>(),
+                get<FolderPathManager>(),
+                get<VoskModelCheck>(),
+                get<ModelRetriever>()
+            )
+        }
+
+        single {
+            STTFactory(
+                androidSSTManagerFactory = {
+                    get<AndroidSSTManager>()
+                },
+                voskSttManagerFactory = {
+                    get<VoskSttManager>()
+                }
+            )
+        }
     }

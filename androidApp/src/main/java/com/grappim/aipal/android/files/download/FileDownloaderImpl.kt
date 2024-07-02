@@ -25,7 +25,7 @@ class FileDownloaderImpl : FileDownloader {
         link: String,
         fileToSave: File,
         tempFile: File,
-        progressCallback: (currentBytes: Long, totalBytes: Long) -> Unit,
+        progressCallback: (progress:Int) -> Unit,
     ) = withContext(Dispatchers.IO) {
         client.prepareGet(link).execute { httpResponse ->
             val channel: ByteReadChannel = httpResponse.body()
@@ -38,7 +38,8 @@ class FileDownloaderImpl : FileDownloader {
                     tempFile.appendBytes(bytes)
                     logging.d { "Received ${tempFile.length()} bytes from $contentLength" }
                     currentBytes += bytes.size
-                    progressCallback(currentBytes, contentLength)
+                    val progress = if (contentLength > 0) (currentBytes * 100 / contentLength) else 0
+                    progressCallback(progress.toInt())
                 }
             }
             if (tempFile.renameTo(fileToSave)) {

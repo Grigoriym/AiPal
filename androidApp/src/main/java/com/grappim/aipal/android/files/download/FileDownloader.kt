@@ -7,6 +7,6 @@ interface FileDownloader {
         link: String,
         fileToSave: File,
         tempFile: File,
-        progressCallback: (currentBytes: Long, totalBytes: Long) -> Unit,
+        progressCallback: (progress: Int) -> Unit,
     )
 }

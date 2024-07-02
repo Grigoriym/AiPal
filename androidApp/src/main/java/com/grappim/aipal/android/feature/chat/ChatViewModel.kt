@@ -5,11 +5,12 @@ import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.grappim.aipal.android.recognition.factory.SSTFactory
+import com.grappim.aipal.android.recognition.factory.STTFactory
 import com.grappim.aipal.core.LaunchedEffectResult
 import com.grappim.aipal.data.exceptions.OpenAiEmptyApiKeyException
 import com.grappim.aipal.data.local.LocalDataStorage
 import com.grappim.aipal.data.recognition.CurrentSTTManager
+import com.grappim.aipal.data.recognition.ModelRetrievalState
 import com.grappim.aipal.data.recognition.STTManager
 import com.grappim.aipal.data.repo.AiPalRepo
 import com.grappim.aipal.feature.chat.ChatMessageUI
@@ -18,16 +19,18 @@ import com.grappim.aipal.feature.chat.SnackbarData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.lighthousegames.logging.logging
 
 class ChatViewModel(
     private val aiPalRepo: AiPalRepo,
     private val localDataStorage: LocalDataStorage,
-    private val sstFactory: SSTFactory,
+    private val sttFactory: STTFactory,
 ) : ViewModel() {
-    private var sstManager: STTManager = sstFactory.getSSTManager(CurrentSTTManager.default())
+    private var sttManager: STTManager
 
     private val _state =
         MutableStateFlow(
@@ -36,6 +39,7 @@ class ChatViewModel(
                 onEditClientMessage = ::editResultMessage,
                 toggleSTT = ::toggleSTT,
                 dismissSnackbar = ::dismissSnackbar,
+                onDismissDialog = ::dismissDialog
             ),
         )
     val state = _state.asStateFlow()
@@ -43,6 +47,7 @@ class ChatViewModel(
     private val logging = logging()
 
     init {
+        sttManager = runBlocking { sttFactory.getSSTManager(localDataStorage.sttManager.first()) }
         viewModelScope.launch {
             launch {
                 localDataStorage.sttManager
@@ -56,15 +61,26 @@ class ChatViewModel(
 
     private fun updateSSTManager(newManger: CurrentSTTManager) {
         viewModelScope.launch {
-            sstManager.cancel()
-            sstManager = sstFactory.getSSTManager(newManger)
+            sttManager.cancel()
+            sttManager = sttFactory.getSSTManager(newManger)
 
-            sstManager.state.collect { value ->
+            sttManager.state.collect { value ->
+                logging.d { "value: $value" }
+                logging.d { "previous message: ${state.value.clientMessage}" }
                 val message = state.value.clientMessage + " " + value.result
                 logging.d { "here is the result: $message" }
                 val fabIcon = if (value.isSpeaking) Icons.Filled.MicOff else Icons.Filled.Mic
                 _state.update {
                     it.copy(
+                        isDownloading = value.modelRetrievalResult.modelRetrievalState is ModelRetrievalState.Downloading ||
+                                value.modelRetrievalResult.modelRetrievalState is ModelRetrievalState.Unzipping ||
+                                value.modelRetrievalResult.modelRetrievalState is ModelRetrievalState.Downloaded ||
+                                value.modelRetrievalResult.modelRetrievalState is ModelRetrievalState.Unzipped,
+                        isListening = value.isSpeaking,
+                        isPreparingModel = value.modelRetrievalResult.modelRetrievalState is ModelRetrievalState.ModelLoading,
+                        showAlertDialog = value.modelRetrievalResult.modelRetrievalState !is ModelRetrievalState.ModelReady &&
+                                value.modelRetrievalResult.modelRetrievalState !is ModelRetrievalState.Initial &&
+                                value.modelRetrievalResult.modelRetrievalState !is ModelRetrievalState.ModelLoading,
                         clientMessage = message.trim(),
                         fabIcon = fabIcon,
                         snackbarMessage = LaunchedEffectResult(SnackbarData(message = value.error)),
@@ -74,9 +90,13 @@ class ChatViewModel(
         }
     }
 
+    private fun dismissDialog() {
+        _state.update { it.copy(showAlertDialog = true) }
+    }
+
     override fun onCleared() {
         super.onCleared()
-        sstManager.cancel()
+        sttManager.cancel()
     }
 
     private fun dismissSnackbar() {
@@ -95,12 +115,12 @@ class ChatViewModel(
                     _state.update {
                         it.copy(
                             snackbarMessage =
-                                LaunchedEffectResult(
-                                    SnackbarData(
-                                        message = e.message ?: "Error, try checking api key",
-                                        goToApiKeysScreen = e is OpenAiEmptyApiKeyException,
-                                    ),
+                            LaunchedEffectResult(
+                                SnackbarData(
+                                    message = e.message ?: "Error, try checking api key",
+                                    goToApiKeysScreen = e is OpenAiEmptyApiKeyException,
                                 ),
+                            ),
                         )
                     }
                 }.onSuccess { value ->
@@ -140,12 +160,12 @@ class ChatViewModel(
                     _state.update {
                         it.copy(
                             snackbarMessage =
-                                LaunchedEffectResult(
-                                    SnackbarData(
-                                        message = e.message ?: "Error, try checking api key",
-                                        goToApiKeysScreen = e is OpenAiEmptyApiKeyException,
-                                    ),
+                            LaunchedEffectResult(
+                                SnackbarData(
+                                    message = e.message ?: "Error, try checking api key",
+                                    goToApiKeysScreen = e is OpenAiEmptyApiKeyException,
                                 ),
+                            ),
                         )
                     }
                 }.onSuccess { value ->
@@ -161,15 +181,15 @@ class ChatViewModel(
     }
 
     private fun turnOffSpeechService() {
-        sstManager.stopListening()
+        sttManager.stopListening()
     }
 
     private fun toggleSTT() {
         viewModelScope.launch {
-            if (sstManager.state.value.isSpeaking) {
-                sstManager.stopListening()
+            if (sttManager.state.value.isSpeaking) {
+                sttManager.stopListening()
             } else {
-                sstManager.startListening()
+                sttManager.startListening()
             }
         }
     }

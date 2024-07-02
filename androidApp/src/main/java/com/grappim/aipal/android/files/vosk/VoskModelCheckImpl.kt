@@ -1,12 +1,18 @@
 package com.grappim.aipal.android.files.vosk
 
+import com.grappim.aipal.android.files.path.FolderPathManager
+import com.grappim.aipal.core.SupportedLanguage
+import com.grappim.aipal.core.voskModelsUrls
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
 
-class VoskModelCheckImpl(private val json: Json) : VoskModelCheck {
+class VoskModelCheckImpl(
+    private val json: Json,
+    private val folderPathManager: FolderPathManager
+) : VoskModelCheck {
 
     override suspend fun isModelAvailable(
         modelFolder: File,
@@ -22,6 +28,24 @@ class VoskModelCheckImpl(private val json: Json) : VoskModelCheck {
             }
             val dataInfo = readDataInfo(modelFolder, lang)
             dataInfo?.downloadLink == expectedLink
+        }
+
+    override suspend fun whichModelsAvailable(): List<VoskModelAvailability> =
+        withContext(Dispatchers.IO) {
+            SupportedLanguage.entries.map { entry ->
+                val modelFolder = folderPathManager.getVoskModelFolder(entry.lang)
+                val link = requireNotNull(voskModelsUrls[entry.lang])
+                val isAvailable = isModelAvailable(
+                    modelFolder = modelFolder,
+                    expectedLink = link,
+                    lang = entry.lang
+                )
+
+                VoskModelAvailability(
+                    supportedLanguage = entry,
+                    isAvailable = isAvailable
+                )
+            }
         }
 
     override suspend fun writeDataInfo(mainFolder: File, downloadLink: String, lang: String) =

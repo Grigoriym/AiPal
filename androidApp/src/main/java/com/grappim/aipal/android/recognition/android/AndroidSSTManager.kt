@@ -7,14 +7,17 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.speech.SpeechRecognizer.ERROR_CLIENT
 import androidx.annotation.MainThread
+import com.grappim.aipal.core.SupportedLanguage
 import com.grappim.aipal.data.local.LocalDataStorage
 import com.grappim.aipal.data.recognition.RecognitionState
 import com.grappim.aipal.data.recognition.STTManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.withContext
 import org.lighthousegames.logging.logging
 
 class AndroidSSTManager(
@@ -30,12 +33,12 @@ class AndroidSSTManager(
         _state.asStateFlow()
 
     @MainThread
-    override suspend fun startListening() {
+    override suspend fun startListening() = withContext(Dispatchers.Main) {
         setDefaultState()
 
         if (!speechRecognitionWrapper.isRecognitionAvailable()) {
             _state.update { it.copy(error = "Recognition is not available") }
-            return
+            return@withContext
         }
 
         val languageCode = localDataStorage.currentLanguage.first().lang
@@ -49,9 +52,13 @@ class AndroidSSTManager(
                 )
                 putExtra(RecognizerIntent.EXTRA_LANGUAGE, languageCode)
             }
-        speechRecognitionWrapper.setRecognitionListener(this)
+        speechRecognitionWrapper.setRecognitionListener(this@AndroidSSTManager)
         speechRecognitionWrapper.startListening(intent)
         _state.update { it.copy(isSpeaking = true) }
+    }
+
+    override suspend fun changeLanguage(supportedLanguage: SupportedLanguage) {
+        speechRecognitionWrapper.cancel()
     }
 
     override fun stopListening() {
@@ -76,10 +83,11 @@ class AndroidSSTManager(
         _state.update { it.copy(isSpeaking = false) }
     }
 
+    //sometimes it randomly sends an error, which does not give any useful info
     override fun onError(error: Int) {
         logging.d { "onError ErrorCode: $error" }
         if (error == ERROR_CLIENT) return
-        _state.update { it.copy(error = "ErrorCode: $error") }
+//        _state.update { it.copy(error = "ErrorCode: $error") }
     }
 
     override fun onResults(results: Bundle?) {

@@ -10,19 +10,21 @@ import java.util.zip.ZipInputStream
 class FileUnzipManagerImpl : FileUnzipManager {
 
     companion object {
-        private const val BUFFER_SIZE = 1024 * 256
+        private const val BUFFER_SIZE = 1024 * 8
     }
 
     private val logging = logging()
 
     override suspend fun unzip(
         zipFile: File,
-        destDirectory: File
+        destDirectory: File,
+        progressCallback: (progress: Int) -> Unit
     ): Unit = withContext(Dispatchers.IO) {
-        if (!destDirectory.exists()) {
-            destDirectory.mkdirs()
-        }
+        progressCallback(0)
         val destDirPath = destDirectory.canonicalPath
+
+        val totalSize = zipFile.length()
+        var processedSize = 0L
 
         ZipInputStream(zipFile.inputStream()).use { zipIn ->
             var entry = zipIn.nextEntry
@@ -54,13 +56,17 @@ class FileUnzipManagerImpl : FileUnzipManager {
                     if (!entry.isDirectory) {
                         // If the entry is a file, extract it
                         extractFile(zipIn, filePath)
+                        processedSize += entry.compressedSize
+                        val percentage = if (totalSize > 0) (processedSize * 100 / totalSize) else 0
+                        logging.d { "unzipping :${percentage.coerceAtMost(100)}" }
+                        progressCallback(percentage.coerceAtMost(100).toInt())
                     } else {
                         // If the entry is a directory, make the directory
                         val dir = File(filePath)
                         dir.mkdirs()
                     }
                 }
-                logging.d { "unzipping" }
+
                 zipIn.closeEntry()
                 entry = zipIn.nextEntry
             }
@@ -69,14 +75,16 @@ class FileUnzipManagerImpl : FileUnzipManager {
         zipFile.delete()
     }
 
-    private fun extractFile(zipIn: ZipInputStream, filePath: String) {
+    private fun extractFile(
+        zipIn: ZipInputStream,
+        filePath: String
+    ) {
         File(filePath).parentFile?.mkdirs() // Create parent directories if they don't exist
         FileOutputStream(filePath).use { fos ->
             val buffer = ByteArray(BUFFER_SIZE)
-            var length = zipIn.read(buffer)
-            while (length >= 0) {
+            var length: Int
+            while (zipIn.read(buffer).also { length = it } >= 0) {
                 fos.write(buffer, 0, length)
-                length = zipIn.read(buffer)
             }
         }
     }
