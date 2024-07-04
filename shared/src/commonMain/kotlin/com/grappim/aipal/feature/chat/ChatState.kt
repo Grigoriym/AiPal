@@ -6,7 +6,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.grappim.aipal.core.LaunchedEffectResult
 
 data class ChatState(
-    val listeningState: ListeningState = ListeningState.Idle,
     val clientMessage: String = "",
     val assistantMessage: String = "",
     val models: List<String> = emptyList(),
@@ -32,9 +31,3 @@ data class SnackbarData(
     val message: String = "",
     val goToApiKeysScreen: Boolean = false
 )
-
-sealed interface ListeningState {
-    data object Idle : ListeningState
-
-    data object Listening : ListeningState
-}
