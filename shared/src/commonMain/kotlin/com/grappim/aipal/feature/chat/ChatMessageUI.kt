@@ -7,4 +7,5 @@ data class ChatMessageUI(
     val message: String,
     val isUserMessage: Boolean,
     val translation: String = "",
+    val spellingCheck: String = ""
 )

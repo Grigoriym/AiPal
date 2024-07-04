@@ -17,9 +17,11 @@ class PromptsViewModel(
     private val _state = MutableStateFlow(
         PromptsState(
             onSetTranslationPrompt = ::setTranslationPrompt,
+            saveTranslationPrompt = ::saveTranslationPrompt,
             onSetBehavior = ::setBehavior,
             saveBehavior = ::saveBehavior,
-            saveTranslationPrompt = ::saveTranslationPrompt
+            onSetSpelling = ::setSpelling,
+            saveSpelling = ::saveSpellingPrompt
         )
     )
     val state = _state.asStateFlow()
@@ -37,6 +39,21 @@ class PromptsViewModel(
                     aiPalRepo.setBehavior(state.value.behavior)
                 }
             }
+            launch {
+                localDataStorage.spellingPrompt.collect { value ->
+                    setSpelling(value)
+                }
+            }
+        }
+    }
+
+    private fun setSpelling(text: String) {
+        _state.update { it.copy(spellingCheckPrompt = text) }
+    }
+
+    private fun saveSpellingPrompt() {
+        viewModelScope.launch {
+            localDataStorage.setSpellingPrompt(state.value.spellingCheckPrompt)
         }
     }
 

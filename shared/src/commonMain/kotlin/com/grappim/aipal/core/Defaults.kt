@@ -8,7 +8,11 @@ const val DEFAULT_BEHAVIOR =
             "show me my errors and provide ways to fix them."
 
 const val DEFAULT_TRANSLATION_PROMPT = "Translate the next message to English, " +
-        "Give me only the translation and nothing else"
+        "give me only the translation and nothing else"
+
+const val DEFAULT_SPELLING_CHECK_PROMPT = "Check the next message for any types of errors, " +
+        "and provide me only the correct answer and nothing else. If the sentence is fine just send me " +
+        "that sentence that I have provided"
 
 const val DEFAULT_LANGUAGE = "de"
 

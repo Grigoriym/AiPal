@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -21,6 +23,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun PromptsRoute(viewModel: PromptsViewModel = koinViewModel(), onBack: () -> Unit) {
     val state by viewModel.state.collectAsState()
+    val scrollState = rememberScrollState()
     Scaffold(
         topBar = {
             PlatoTopBar(onBack = onBack, title = "Prompts")
@@ -29,7 +32,8 @@ fun PromptsRoute(viewModel: PromptsViewModel = koinViewModel(), onBack: () -> Un
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(horizontal = 16.dp)
+                .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(text = "Behavior sets the initial setup for the AI, i.e. context")
@@ -63,6 +67,25 @@ fun PromptsRoute(viewModel: PromptsViewModel = koinViewModel(), onBack: () -> Un
             Button(onClick = state.saveTranslationPrompt) {
                 Text(text = "Set Translation Prompt")
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(text = "Spelling Check Prompt sets the message which is sent upon checking the spelling")
+            Spacer(modifier = Modifier.height(6.dp))
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = state.spellingCheckPrompt,
+                onValueChange = state.onSetSpelling,
+                label = { Text("TranslationPrompt") },
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Button(onClick = state.saveSpelling) {
+                Text(text = "Set Translation Prompt")
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
         }
     }
 }

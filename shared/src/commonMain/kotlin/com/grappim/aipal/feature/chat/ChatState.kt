@@ -22,7 +22,8 @@ data class ChatState(
     val isDownloading: Boolean = false,
     val showAlertDialog: Boolean = false,
     val onDismissDialog: () -> Unit,
-    val acknowledgeError: () -> Unit
+    val acknowledgeError: () -> Unit,
+    val onSpellCheck: (ChatMessageUI) -> Unit
 ) {
     fun getMessagesForUi() = listMessages.filter { it.message.isNotEmpty() }
 }

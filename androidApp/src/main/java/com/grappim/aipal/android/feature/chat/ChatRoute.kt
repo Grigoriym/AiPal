@@ -34,6 +34,7 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Spellcheck
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
@@ -49,7 +50,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -204,6 +204,9 @@ fun ChatRoute(
                     onTranslate = { chatMessage ->
                         viewModel.translateMessage(chatMessage)
                     },
+                    onSpellCheck = { chatMessage ->
+                        state.onSpellCheck(chatMessage)
+                    }
                 )
             }
         }
@@ -228,6 +231,7 @@ private fun ChatItem(
     onRepeat: (String) -> Unit,
     onMessageCopy: (String) -> Unit,
     onTranslate: (ChatMessageUI) -> Unit,
+    onSpellCheck: (ChatMessageUI) -> Unit,
 ) {
     Row(
         modifier =
@@ -262,6 +266,12 @@ private fun ChatItem(
                 modifier = Modifier.padding(16.dp),
             ) {
                 Text(text = message.message)
+                if (message.spellingCheck.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    HorizontalDivider(color = Color.Blue, thickness = 1.dp)
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(text = message.spellingCheck)
+                }
                 if (message.translation.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(4.dp))
                     HorizontalDivider(color = Color.Blue, thickness = 1.dp)
@@ -273,6 +283,9 @@ private fun ChatItem(
         if (message.isUserMessage) {
             IconButton(onClick = { onMessageCopy(message.message) }) {
                 Icon(imageVector = Icons.Filled.ContentCopy, contentDescription = "")
+            }
+            IconButton(onClick = { onSpellCheck(message) }) {
+                Icon(imageVector = Icons.Filled.Spellcheck, contentDescription = "")
             }
         }
     }

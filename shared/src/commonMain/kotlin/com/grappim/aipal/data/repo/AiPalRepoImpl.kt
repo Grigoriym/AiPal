@@ -47,6 +47,36 @@ class AiPalRepoImpl(
 
     private suspend fun getOpenAi(): OpenAI? = openAiFlow.firstOrNull()
 
+    override suspend fun checkSpelling(msg: String): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            val service = getOpenAi() ?: throw OpenAiEmptyApiKeyException()
+            val chatCompletionRequest =
+                createChatCompletionRequest(
+                    listOf(
+                        ChatMessage(
+                            role = Role.System,
+                            content = localDataStorage.spellingPrompt.first(),
+                        ),
+                        ChatMessage(
+                            role = Role.User,
+                            content = msg,
+                        ),
+                    ),
+                )
+            val completion = service.chatCompletion(chatCompletionRequest)
+            val receivedMessage =
+                completion.choices
+                    .first()
+                    .message
+            Result.success(receivedMessage.content ?: "")
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            logging.e { e }
+            Result.failure(e)
+        }
+    }
+
     override suspend fun translateMessage(msg: String): Result<String> =
         withContext(Dispatchers.IO) {
             try {

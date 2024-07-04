@@ -8,4 +8,6 @@ interface AiPalRepo {
     fun setBehavior(msg: String)
 
     suspend fun translateMessage(msg: String): Result<String>
+
+    suspend fun checkSpelling(msg: String): Result<String>
 }

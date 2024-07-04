@@ -43,7 +43,8 @@ class ChatViewModel(
                 toggleSTT = ::toggleSTT,
                 dismissSnackbar = ::dismissSnackbar,
                 onDismissDialog = ::dismissDialog,
-                acknowledgeError = ::acknowledgeError
+                acknowledgeError = ::acknowledgeError,
+                onSpellCheck = ::checkSpelling
             ),
         )
     val state = _state.asStateFlow()
@@ -104,6 +105,36 @@ class ChatViewModel(
 
     private fun onMessageClear() {
         editResultMessage("")
+    }
+
+    private fun checkSpelling(chatMessageUI: ChatMessageUI) {
+        viewModelScope.launch {
+            val result = aiPalRepo.checkSpelling(chatMessageUI.message)
+            result
+                .onFailure { e ->
+                    _state.update {
+                        it.copy(
+                            snackbarMessage =
+                            LaunchedEffectResult(
+                                SnackbarData(
+                                    message = e.message ?: "Error, try checking api key",
+                                    goToApiKeysScreen = e is OpenAiEmptyApiKeyException,
+                                ),
+                            ),
+                        )
+                    }
+                }.onSuccess { value ->
+                    if (value.isNotEmpty()) {
+                        val newUiMessage = chatMessageUI.copy(spellingCheck = value)
+                        val messages = state.value.listMessages.toMutableList()
+                        val index = messages.indexOf(chatMessageUI)
+                        messages[index] = newUiMessage
+                        _state.update {
+                            it.copy(listMessages = messages.toList())
+                        }
+                    }
+                }
+        }
     }
 
     fun translateMessage(chatMessageUI: ChatMessageUI) {
