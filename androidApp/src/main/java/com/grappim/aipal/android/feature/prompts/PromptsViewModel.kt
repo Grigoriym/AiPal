@@ -19,7 +19,9 @@ class PromptsViewModel(
             onSetBehavior = ::setBehavior,
             saveBehavior = ::saveBehavior,
             onSetSpelling = ::setSpelling,
-            saveSpelling = ::saveSpellingPrompt
+            saveSpelling = ::saveSpellingPrompt,
+            onSetAiAnswerFixPrompt = ::setAiAnswerFixPrompt,
+            saveAiAnswerFixPrompt = ::saveAiAnswerFixPrompt
         )
     )
     val state = _state.asStateFlow()
@@ -29,6 +31,7 @@ class PromptsViewModel(
             launch {
                 localDataStorage.translationPrompt.collect { value ->
                     setTranslationPrompt(value)
+
                 }
             }
             launch {
@@ -41,6 +44,21 @@ class PromptsViewModel(
                     setSpelling(value)
                 }
             }
+            launch {
+                localDataStorage.aiAnswerFixPrompt.collect { value ->
+                    setAiAnswerFixPrompt(value)
+                }
+            }
+        }
+    }
+
+    private fun setAiAnswerFixPrompt(text: String) {
+        _state.update { it.copy(aiAnswerFixPrompt = text) }
+    }
+
+    private fun saveAiAnswerFixPrompt() {
+        viewModelScope.launch {
+            localDataStorage.setAiAnswerFixPrompt(state.value.aiAnswerFixPrompt)
         }
     }
 

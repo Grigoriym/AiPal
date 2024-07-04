@@ -16,3 +16,6 @@ const val DEFAULT_SPELLING_CHECK_PROMPT = "Check the next message for any types 
 
 const val DEFAULT_VOSK_SAMPLE_RATE = 16000.0f
 const val SAMPLE_RATE = 44100.0f
+
+const val DEFAULT_AI_ANSWER_FIX_PROMPT = "Please answer me without special symbols, like *, because " +
+        "otherwise the TTS engine will also pronounce those special symbols."

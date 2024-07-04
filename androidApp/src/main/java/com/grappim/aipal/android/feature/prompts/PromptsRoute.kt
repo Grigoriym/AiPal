@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -32,60 +33,81 @@ fun PromptsRoute(viewModel: PromptsViewModel = koinViewModel(), onBack: () -> Un
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(horizontal = 16.dp)
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Behavior sets the initial setup for the AI, i.e. context")
-            Spacer(modifier = Modifier.height(6.dp))
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
+            PromptElementContent(
+                title = "Behavior sets the initial setup for the AI, i.e. context",
                 value = state.behavior,
                 onValueChange = state.onSetBehavior,
-                label = { Text("Behavior") },
+                label = "Behavior prompt",
+                onSave = state.saveBehavior,
+                saveButtonText = "Save Behavior"
             )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Button(onClick = state.saveBehavior) {
-                Text(text = "Set behavior")
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(text = "Translation Prompt sets the message which is sent upon translating the text")
-            Spacer(modifier = Modifier.height(6.dp))
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
+            Spacer(modifier = Modifier.height(8.dp))
+            PromptElementContent(
+                title = "Translation Prompt sets the message which is sent upon translating the text",
                 value = state.translationPrompt,
                 onValueChange = state.onSetTranslationPrompt,
-                label = { Text("TranslationPrompt") },
+                label = "Translation prompt",
+                onSave = state.saveTranslationPrompt,
+                saveButtonText = "Save Translation Prompt"
             )
-
+            Spacer(modifier = Modifier.height(8.dp))
+            PromptElementContent(
+                title = "Spelling Check Prompt sets the message which is sent upon checking the spelling",
+                value = state.spellingCheckPrompt,
+                onValueChange = state.onSetSpelling,
+                label = "Spelling check prompt",
+                onSave = state.saveSpelling,
+                saveButtonText = "Save Spelling check prompt"
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            PromptElementContent(
+                title = "A Prompt for removing some symbols from AI answer so that TTS " +
+                        "engine wouldn't pronounce them",
+                value = state.aiAnswerFixPrompt,
+                onValueChange = state.onSetAiAnswerFixPrompt,
+                label = "Ai fix Prompt",
+                onSave = state.saveAiAnswerFixPrompt,
+                saveButtonText = "Save Ai fix prompt"
+            )
             Spacer(modifier = Modifier.height(12.dp))
+        }
+    }
+}
 
-            Button(onClick = state.saveTranslationPrompt) {
-                Text(text = "Set Translation Prompt")
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(text = "Spelling Check Prompt sets the message which is sent upon checking the spelling")
+@Composable
+private fun PromptElementContent(
+    modifier: Modifier = Modifier,
+    title: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    onSave: () -> Unit,
+    saveButtonText: String
+) {
+    Card(
+        modifier = modifier.padding(horizontal = 16.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(8.dp)
+        ) {
+            Text(text = title)
             Spacer(modifier = Modifier.height(6.dp))
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = state.spellingCheckPrompt,
-                onValueChange = state.onSetSpelling,
-                label = { Text("TranslationPrompt") },
+                value = value,
+                onValueChange = onValueChange,
+                label = { Text(label) },
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Button(onClick = state.saveSpelling) {
-                Text(text = "Set Translation Prompt")
+            Button(onClick = onSave) {
+                Text(text = saveButtonText)
             }
-
-            Spacer(modifier = Modifier.height(12.dp))
         }
     }
 }
