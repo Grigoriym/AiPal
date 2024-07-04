@@ -6,7 +6,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.grappim.aipal.core.LaunchedEffectResult
 
 data class ChatState(
-    val listeningState: ListeningState = ListeningState.Idle,
     val clientMessage: String = "",
     val assistantMessage: String = "",
     val models: List<String> = emptyList(),
@@ -22,7 +21,8 @@ data class ChatState(
     val isDownloading: Boolean = false,
     val showAlertDialog: Boolean = false,
     val onDismissDialog: () -> Unit,
-    val acknowledgeError: () -> Unit
+    val acknowledgeError: () -> Unit,
+    val onSpellCheck: (ChatMessageUI) -> Unit
 ) {
     fun getMessagesForUi() = listMessages.filter { it.message.isNotEmpty() }
 }
@@ -31,9 +31,3 @@ data class SnackbarData(
     val message: String = "",
     val goToApiKeysScreen: Boolean = false
 )
-
-sealed interface ListeningState {
-    data object Idle : ListeningState
-
-    data object Listening : ListeningState
-}

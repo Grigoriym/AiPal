@@ -31,7 +31,7 @@ val viewModelsModule =
             MainViewModel(get<LocalDataStorage>())
         }
         viewModel {
-            PromptsViewModel(get<LocalDataStorage>(), get<AiPalRepo>())
+            PromptsViewModel(get<LocalDataStorage>())
         }
         viewModel {
             ApiKeysViewModel(get<LocalDataStorage>(), get<AiPalRepo>())

@@ -100,7 +100,7 @@ class VoskSttManager(
                     )
                 )
             }
-            model = Model(folderPathManager.getVoskModelFolder(lang).absolutePath)
+            model = getVoskModel(lang)
             startRecognizer(supportedLanguage)
         }
     }
@@ -121,12 +121,13 @@ class VoskSttManager(
     }
 
     override suspend fun changeLanguage(supportedLanguage: SupportedLanguage) {
+        logging.d { "changeLanguage: $supportedLanguage" }
         model = null
 
         val lang = supportedLanguage.lang
         val isModelAvailable = voskModelCheck.isModelAvailable(lang = lang)
         if (isModelAvailable) {
-            model = Model(folderPathManager.getVoskModelFolder(lang).absolutePath)
+            model = getVoskModel(lang)
             _state.update {
                 it.copy(
                     modelRetrievalResult = it.modelRetrievalResult.copy(
@@ -136,6 +137,10 @@ class VoskSttManager(
                 )
             }
         }
+    }
+
+    private suspend fun getVoskModel(lang: String): Model = withContext(Dispatchers.IO) {
+        Model(folderPathManager.getVoskModelFolder(lang).absolutePath)
     }
 
     override suspend fun isCurrentLanguageModelAvailable(): Boolean = withContext(Dispatchers.IO) {

@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.grappim.aipal.core.DEFAULT_BEHAVIOR
 import com.grappim.aipal.core.DEFAULT_MODEL
+import com.grappim.aipal.core.DEFAULT_SPELLING_CHECK_PROMPT
 import com.grappim.aipal.core.DEFAULT_TEMPERATURE
 import com.grappim.aipal.core.DEFAULT_TRANSLATION_PROMPT
 import com.grappim.aipal.core.SupportedLanguage
@@ -15,7 +16,6 @@ import com.grappim.aipal.data.model.DarkThemeConfig
 import com.grappim.aipal.data.recognition.CurrentSTTManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import org.lighthousegames.logging.logging
 
 class LocalDataStorageImpl(
     private val dataStore: DataStore<Preferences>,
@@ -56,6 +56,12 @@ class LocalDataStorageImpl(
     override val translationPrompt: Flow<String> =
         dataStore.data.map { value ->
             value[translationPromptKey] ?: DEFAULT_TRANSLATION_PROMPT
+        }
+
+    private val spellingPromptKey = stringPreferencesKey("spelling_prompt_key")
+    override val spellingPrompt: Flow<String> =
+        dataStore.data.map { value ->
+            value[spellingPromptKey] ?: DEFAULT_SPELLING_CHECK_PROMPT
         }
 
     private val behaviorKey = stringPreferencesKey("behavior_key")
@@ -135,6 +141,12 @@ class LocalDataStorageImpl(
     override suspend fun setSttManager(sstManager: CurrentSTTManager) {
         dataStore.edit { settings ->
             settings[sstManagerKey] = sstManager.name
+        }
+    }
+
+    override suspend fun setSpellingPrompt(prompt: String) {
+        dataStore.edit { settings ->
+            settings[spellingPromptKey] = prompt
         }
     }
 }

@@ -3,7 +3,6 @@ package com.grappim.aipal.android.feature.prompts
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grappim.aipal.data.local.LocalDataStorage
-import com.grappim.aipal.data.repo.AiPalRepo
 import com.grappim.aipal.feature.prompts.PromptsState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,15 +10,16 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class PromptsViewModel(
-    private val localDataStorage: LocalDataStorage,
-    private val aiPalRepo: AiPalRepo
+    private val localDataStorage: LocalDataStorage
 ) : ViewModel() {
     private val _state = MutableStateFlow(
         PromptsState(
             onSetTranslationPrompt = ::setTranslationPrompt,
+            saveTranslationPrompt = ::saveTranslationPrompt,
             onSetBehavior = ::setBehavior,
             saveBehavior = ::saveBehavior,
-            saveTranslationPrompt = ::saveTranslationPrompt
+            onSetSpelling = ::setSpelling,
+            saveSpelling = ::saveSpellingPrompt
         )
     )
     val state = _state.asStateFlow()
@@ -34,9 +34,23 @@ class PromptsViewModel(
             launch {
                 localDataStorage.behavior.collect { value ->
                     setBehavior(value)
-                    aiPalRepo.setBehavior(state.value.behavior)
                 }
             }
+            launch {
+                localDataStorage.spellingPrompt.collect { value ->
+                    setSpelling(value)
+                }
+            }
+        }
+    }
+
+    private fun setSpelling(text: String) {
+        _state.update { it.copy(spellingCheckPrompt = text) }
+    }
+
+    private fun saveSpellingPrompt() {
+        viewModelScope.launch {
+            localDataStorage.setSpellingPrompt(state.value.spellingCheckPrompt)
         }
     }
 
