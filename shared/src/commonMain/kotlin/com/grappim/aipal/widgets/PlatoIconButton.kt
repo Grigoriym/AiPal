@@ -20,8 +20,7 @@ fun PlatoIconButton(modifier: Modifier = Modifier, icon: ImageVector, onButtonCl
     ) {
         Icon(
             imageVector = icon,
-            contentDescription = "",
-            tint = Color.Black
+            contentDescription = ""
         )
     }
 }
