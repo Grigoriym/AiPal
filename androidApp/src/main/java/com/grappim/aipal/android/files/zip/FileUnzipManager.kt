@@ -6,6 +6,6 @@ interface FileUnzipManager {
     suspend fun unzip(
         zipFile: File,
         destDirectory: File,
-        progressCallback: (progress: Int) -> Unit
+        progressCallback: suspend (progress: Int) -> Unit
     )
 }

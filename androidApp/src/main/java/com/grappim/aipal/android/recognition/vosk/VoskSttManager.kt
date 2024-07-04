@@ -8,7 +8,6 @@ import com.grappim.aipal.android.recognition.Downloadable
 import com.grappim.aipal.android.recognition.ModelAvailabilityRetrieval
 import com.grappim.aipal.core.SAMPLE_RATE
 import com.grappim.aipal.core.SupportedLanguage
-import com.grappim.aipal.core.voskModelsUrls
 import com.grappim.aipal.data.local.LocalDataStorage
 import com.grappim.aipal.data.recognition.ModelRetrievalResult
 import com.grappim.aipal.data.recognition.ModelRetrievalState
@@ -16,8 +15,8 @@ import com.grappim.aipal.data.recognition.RecognitionState
 import com.grappim.aipal.data.recognition.STTManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -41,8 +40,10 @@ class VoskSttManager(
     RecognitionListener,
     Downloadable,
     ModelAvailabilityRetrieval {
+
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
+    private var runningJob: Job? = null
 
     private val logging = logging()
 
@@ -52,11 +53,22 @@ class VoskSttManager(
     private var model: Model? = null
     private var speechService: SpeechService? = null
 
-    init {
-        scope.launch {
+    override fun initialize() {
+        startModelRetriever()
+    }
+
+    private fun startModelRetriever() {
+        runningJob?.cancel()
+        runningJob = scope.launch {
             modelRetriever.state.collect { value ->
+                logging.d { "value from VoskSttManager: $value" }
+                val error =
+                    if (value.modelRetrievalResult.modelRetrievalState is ModelRetrievalState.Error) {
+                        (value.modelRetrievalResult.modelRetrievalState as ModelRetrievalState.Error).errorMessage
+                    } else ""
                 _state.update {
                     it.copy(
+                        error = error,
                         modelRetrievalResult = value.modelRetrievalResult
                     )
                 }
@@ -64,20 +76,20 @@ class VoskSttManager(
         }
     }
 
+    override fun resetToDefaultState() {
+        setDefaultState()
+    }
+
+    private suspend fun getCurrentLanguage() = localDataStorage.currentLanguage.first()
+
     override suspend fun startListening() = withContext(Dispatchers.IO) {
         setDefaultState()
-        val supportedLanguage = localDataStorage.currentLanguage.first()
+        val supportedLanguage = getCurrentLanguage()
         if (model != null) {
             startRecognizer(supportedLanguage)
         } else {
             val lang = supportedLanguage.lang
-            val modelFolder = folderPathManager.getVoskModelFolder(lang)
-            val link = requireNotNull(voskModelsUrls[lang])
-            val isModelAvailable = voskModelCheck.isModelAvailable(
-                modelFolder = modelFolder,
-                expectedLink = link,
-                lang = lang
-            )
+            val isModelAvailable = voskModelCheck.isModelAvailable(lang = lang)
             if (!isModelAvailable) {
                 downloadModelFile(supportedLanguage)
             }
@@ -108,41 +120,28 @@ class VoskSttManager(
         }
     }
 
-    override suspend fun changeLanguage(supportedLanguage: SupportedLanguage) =
-        withContext(Dispatchers.IO) {
-            model = null
+    override suspend fun changeLanguage(supportedLanguage: SupportedLanguage) {
+        model = null
 
-            val lang = supportedLanguage.lang
-            val modelFolder = folderPathManager.getVoskModelFolder(lang)
-            val link = requireNotNull(voskModelsUrls[lang])
-
-            val isModelAvailable = voskModelCheck.isModelAvailable(
-                modelFolder = modelFolder,
-                expectedLink = link,
-                lang = lang
-            )
-            if (isModelAvailable) {
-                model = Model(folderPathManager.getVoskModelFolder(lang).absolutePath)
-                _state.update {
-                    it.copy(
-                        modelRetrievalResult = it.modelRetrievalResult.copy(
-                            supportedLanguage = supportedLanguage,
-                            modelRetrievalState = ModelRetrievalState.ModelReady
-                        )
+        val lang = supportedLanguage.lang
+        val isModelAvailable = voskModelCheck.isModelAvailable(lang = lang)
+        if (isModelAvailable) {
+            model = Model(folderPathManager.getVoskModelFolder(lang).absolutePath)
+            _state.update {
+                it.copy(
+                    modelRetrievalResult = it.modelRetrievalResult.copy(
+                        supportedLanguage = supportedLanguage,
+                        modelRetrievalState = ModelRetrievalState.ModelReady
                     )
-                }
+                )
             }
         }
+    }
 
     override suspend fun isCurrentLanguageModelAvailable(): Boolean = withContext(Dispatchers.IO) {
-        val supportedLanguage = localDataStorage.currentLanguage.first()
+        val supportedLanguage = getCurrentLanguage()
         val lang = supportedLanguage.lang
-        val modelFolder = folderPathManager.getVoskModelFolder(lang)
-        val link = requireNotNull(voskModelsUrls[lang])
-
         voskModelCheck.isModelAvailable(
-            modelFolder = modelFolder,
-            expectedLink = link,
             lang = lang
         )
     }
@@ -151,7 +150,16 @@ class VoskSttManager(
         voskModelCheck.whichModelsAvailable()
 
     private fun setDefaultState() {
-        _state.update { RecognitionState() }
+        scope.launch {
+            val supportedLanguage = getCurrentLanguage()
+            _state.update {
+                RecognitionState(
+                    modelRetrievalResult = ModelRetrievalResult(
+                        supportedLanguage = supportedLanguage
+                    )
+                )
+            }
+        }
     }
 
     override fun stopListening() {
@@ -160,11 +168,12 @@ class VoskSttManager(
         speechService = null
     }
 
-    override fun cancel() {
-        speechService?.cancel()
-        speechService = null
+    override fun cleanup() {
+        stopListening()
+        model = null
 
-        scope.cancel()
+        runningJob?.cancel()
+        runningJob = null
     }
 
     /**
@@ -183,65 +192,6 @@ class VoskSttManager(
     override suspend fun downloadModelFile(supportedLanguage: SupportedLanguage) {
         modelRetriever.downloadModel(supportedLanguage)
     }
-//        withContext(Dispatchers.IO) {
-//            val lang = supportedLanguage.lang
-//            val link = requireNotNull(voskModelsUrls[lang])
-//            val actualFile = File(folderPathManager.getMainFolder(), "${lang}-vosk.zip")
-//            val partialFile = File.createTempFile(
-//                "${lang}_voskModel",
-//                "part",
-//                folderPathManager.getCacheFolder()
-//            )
-//            fileDownloader.downloadFile(
-//                link = link,
-//                fileToSave = actualFile,
-//                tempFile = partialFile,
-//                progressCallback = { progress ->
-//                    logging.d { "Download progress: $progress%" }
-//                    _state.update {
-//                        it.copy(
-//                            modelRetrievalResult = ModelRetrievalResult(
-//                                supportedLanguage = supportedLanguage,
-//                                modelRetrievalState = ModelRetrievalState.Downloading(progress)
-//                            )
-//                        )
-//                    }
-//                }
-//            )
-//            _state.update {
-//                it.copy(
-//                    modelRetrievalResult = it.modelRetrievalResult.copy(
-//                        modelRetrievalState = ModelRetrievalState.Downloaded()
-//                    )
-//                )
-//            }
-//            val unzipDir = folderPathManager.getVoskModelFolder(lang)
-//            fileUnzipManager.unzip(
-//                zipFile = actualFile,
-//                destDirectory = unzipDir,
-//                progressCallback = { progress ->
-//                    logging.d { "Unzip progress: $progress%" }
-//                    _state.update {
-//                        it.copy(
-//                            modelRetrievalResult = it.modelRetrievalResult.copy(
-//                                modelRetrievalState = ModelRetrievalState.Unzipping(progress)
-//                            )
-//                        )
-//                    }
-//                })
-//            voskModelCheck.writeDataInfo(
-//                mainFolder = unzipDir,
-//                downloadLink = link,
-//                lang = lang
-//            )
-//            _state.update {
-//                it.copy(
-//                    modelRetrievalResult = it.modelRetrievalResult.copy(
-//                        modelRetrievalState = ModelRetrievalState.Unzipped()
-//                    )
-//                )
-//            }
-//        }
 
     /**
      * It is called when the microphone is disabled after it was enabled

@@ -61,6 +61,12 @@ class AndroidSSTManager(
         speechRecognitionWrapper.cancel()
     }
 
+    override fun resetToDefaultState() {
+        setDefaultState()
+    }
+
+    override fun initialize() {}
+
     override fun stopListening() {
         setDefaultState()
         speechRecognitionWrapper.stopListening()
@@ -71,7 +77,7 @@ class AndroidSSTManager(
         speechRecognitionWrapper.stopListening()
     }
 
-    override fun cancel() {
+    override fun cleanup() {
         speechRecognitionWrapper.cancel()
     }
 

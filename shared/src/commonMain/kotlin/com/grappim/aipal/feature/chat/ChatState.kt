@@ -21,7 +21,8 @@ data class ChatState(
     val isPreparingModel: Boolean = false,
     val isDownloading: Boolean = false,
     val showAlertDialog: Boolean = false,
-    val onDismissDialog: () -> Unit
+    val onDismissDialog: () -> Unit,
+    val acknowledgeError: () -> Unit
 ) {
     fun getMessagesForUi() = listMessages.filter { it.message.isNotEmpty() }
 }

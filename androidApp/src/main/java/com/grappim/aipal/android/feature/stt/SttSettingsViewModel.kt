@@ -6,10 +6,14 @@ import com.grappim.aipal.android.files.vosk.VoskModelAvailability
 import com.grappim.aipal.android.recognition.Downloadable
 import com.grappim.aipal.android.recognition.ModelAvailabilityRetrieval
 import com.grappim.aipal.android.recognition.factory.STTFactory
+import com.grappim.aipal.core.LaunchedEffectResult
 import com.grappim.aipal.core.SupportedLanguage
 import com.grappim.aipal.data.local.LocalDataStorage
 import com.grappim.aipal.data.recognition.CurrentSTTManager
 import com.grappim.aipal.data.recognition.STTManager
+import com.grappim.aipal.feature.chat.SnackbarData
+import com.grappim.aipal.utils.runAs
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -25,6 +29,8 @@ class SttSettingsViewModel(
 ) : ViewModel() {
     private var sttManager: STTManager
 
+    private var runningJob: Job? = null
+
     private val logging = logging()
 
     private val _state =
@@ -36,7 +42,9 @@ class SttSettingsViewModel(
                 currentLanguage = SupportedLanguage.getDefault(),
                 onSetCurrentLanguage = ::setLanguage,
                 languages = SupportedLanguage.entries.map { it.name }.toSet(),
-                onModelDownload = ::downloadModel
+                onModelDownload = ::downloadModel,
+                onDismissDialog = ::dismissDialog,
+                acknowledgeError = ::acknowledgeError
             ),
         )
     val state = _state.asStateFlow()
@@ -48,6 +56,7 @@ class SttSettingsViewModel(
                 localDataStorage.sttManager.distinctUntilChanged().collect { newStt ->
                     _state.update { it.copy(currentSTTManager = newStt) }
 
+                    logging.d { "received new stt: $newStt" }
                     updateSttManager(newStt)
                 }
             }
@@ -58,6 +67,10 @@ class SttSettingsViewModel(
                 }
             }
         }
+    }
+
+    private fun acknowledgeError() {
+        sttManager.resetToDefaultState()
     }
 
     private fun downloadModel(voskModelAvailability: VoskModelAvailability) {
@@ -77,6 +90,10 @@ class SttSettingsViewModel(
         }
     }
 
+    private fun dismissDialog() {
+        _state.update { it.copy(showAlertDialog = true) }
+    }
+
     private suspend fun checkAvailableModels() {
         if (sttManager is ModelAvailabilityRetrieval) {
             sttManager.runAs<ModelAvailabilityRetrieval> {
@@ -91,8 +108,8 @@ class SttSettingsViewModel(
     }
 
     private fun updateSttManager(newManger: CurrentSTTManager) {
-        viewModelScope.launch {
-            sttManager.cancel()
+        runningJob?.cancel()
+        runningJob = viewModelScope.launch {
             sttManager = sttFactory.getSSTManager(newManger)
 
             checkAvailableModels()
@@ -111,7 +128,11 @@ class SttSettingsViewModel(
                         voskModelUIState = result.modelRetrievalState
                     )
                     _state.update {
-                        it.copy(availableModels = oldList.toList())
+                        it.copy(
+                            availableModels = oldList.toList(),
+                            showAlertDialog = value.modelRetrievalResult.showAlertDialog(),
+                            snackbarMessage = LaunchedEffectResult(SnackbarData(message = value.error)),
+                        )
                     }
                 }
             }
@@ -129,16 +150,5 @@ class SttSettingsViewModel(
             val enum = SupportedLanguage.valueOf(supportedLanguage)
             localDataStorage.setCurrentLanguage(enum)
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        sttManager.cancel()
-    }
-}
-
-inline fun <reified T> Any.runAs(block: T.() -> Unit) {
-    if (this is T) {
-        block()
     }
 }

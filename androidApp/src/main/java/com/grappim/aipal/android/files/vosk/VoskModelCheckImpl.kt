@@ -14,32 +14,23 @@ class VoskModelCheckImpl(
     private val folderPathManager: FolderPathManager
 ) : VoskModelCheck {
 
-    override suspend fun isModelAvailable(
-        modelFolder: File,
-        expectedLink: String,
-        lang: String
-    ): Boolean =
-        withContext(Dispatchers.IO) {
-            if (!modelFolder.exists() ||
-                !modelFolder.isDirectory ||
-                modelFolder.listFiles()?.isEmpty() == true
-            ) {
-                return@withContext false
-            }
-            val dataInfo = readDataInfo(modelFolder, lang)
-            dataInfo?.downloadLink == expectedLink
+    override suspend fun isModelAvailable(lang: String): Boolean = withContext(Dispatchers.IO) {
+        val modelFolder = folderPathManager.getVoskModelFolder(lang)
+        if (!modelFolder.exists() ||
+            !modelFolder.isDirectory ||
+            modelFolder.listFiles()?.isEmpty() == true
+        ) {
+            return@withContext false
         }
+        val dataInfo = readDataInfo(modelFolder, lang)
+        val expectedLink = voskModelsUrls[lang]
+        dataInfo?.downloadLink == expectedLink
+    }
 
     override suspend fun whichModelsAvailable(): List<VoskModelAvailability> =
         withContext(Dispatchers.IO) {
             SupportedLanguage.entries.map { entry ->
-                val modelFolder = folderPathManager.getVoskModelFolder(entry.lang)
-                val link = requireNotNull(voskModelsUrls[entry.lang])
-                val isAvailable = isModelAvailable(
-                    modelFolder = modelFolder,
-                    expectedLink = link,
-                    lang = entry.lang
-                )
+                val isAvailable = isModelAvailable(lang = entry.lang)
 
                 VoskModelAvailability(
                     supportedLanguage = entry,

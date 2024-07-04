@@ -24,6 +24,7 @@ compose-material3 = "1.1.2"
 androidx-activityCompose = "1.8.0"
 androidDesugarJdkLibs = "2.0.4"
 navigation = "2.7.7"
+lifecycle = "2.8.3"
 
 accompanist = "0.34.0"
 
@@ -68,6 +69,10 @@ compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 compose-foundation = { module = "androidx.compose.foundation:foundation" }
 compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "compose-material3" }
+
+androidx-lifecycle-runtime-core = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp" }
 openai-client = { module = "com.aallam.openai:openai-client" }

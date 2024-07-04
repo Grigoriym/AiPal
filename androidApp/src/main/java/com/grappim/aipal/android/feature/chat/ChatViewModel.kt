@@ -16,6 +16,7 @@ import com.grappim.aipal.data.repo.AiPalRepo
 import com.grappim.aipal.feature.chat.ChatMessageUI
 import com.grappim.aipal.feature.chat.ChatState
 import com.grappim.aipal.feature.chat.SnackbarData
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -32,6 +33,8 @@ class ChatViewModel(
 ) : ViewModel() {
     private var sttManager: STTManager
 
+    private var runningJob: Job? = null
+
     private val _state =
         MutableStateFlow(
             ChatState(
@@ -39,7 +42,8 @@ class ChatViewModel(
                 onEditClientMessage = ::editResultMessage,
                 toggleSTT = ::toggleSTT,
                 dismissSnackbar = ::dismissSnackbar,
-                onDismissDialog = ::dismissDialog
+                onDismissDialog = ::dismissDialog,
+                acknowledgeError = ::acknowledgeError
             ),
         )
     val state = _state.asStateFlow()
@@ -52,16 +56,21 @@ class ChatViewModel(
             launch {
                 localDataStorage.sttManager
                     .distinctUntilChanged()
-                    .collect { value ->
-                        updateSSTManager(value)
+                    .collect { newStt ->
+                        logging.d { "received new stt: $newStt" }
+                        updateSSTManager(newStt)
                     }
             }
         }
     }
 
+    private fun acknowledgeError() {
+        sttManager.resetToDefaultState()
+    }
+
     private fun updateSSTManager(newManger: CurrentSTTManager) {
-        viewModelScope.launch {
-            sttManager.cancel()
+        runningJob?.cancel()
+        runningJob = viewModelScope.launch {
             sttManager = sttFactory.getSSTManager(newManger)
 
             sttManager.state.collect { value ->
@@ -72,15 +81,10 @@ class ChatViewModel(
                 val fabIcon = if (value.isSpeaking) Icons.Filled.MicOff else Icons.Filled.Mic
                 _state.update {
                     it.copy(
-                        isDownloading = value.modelRetrievalResult.modelRetrievalState is ModelRetrievalState.Downloading ||
-                                value.modelRetrievalResult.modelRetrievalState is ModelRetrievalState.Unzipping ||
-                                value.modelRetrievalResult.modelRetrievalState is ModelRetrievalState.Downloaded ||
-                                value.modelRetrievalResult.modelRetrievalState is ModelRetrievalState.Unzipped,
+                        isDownloading = value.modelRetrievalResult.isDownloading(),
                         isListening = value.isSpeaking,
                         isPreparingModel = value.modelRetrievalResult.modelRetrievalState is ModelRetrievalState.ModelLoading,
-                        showAlertDialog = value.modelRetrievalResult.modelRetrievalState !is ModelRetrievalState.ModelReady &&
-                                value.modelRetrievalResult.modelRetrievalState !is ModelRetrievalState.Initial &&
-                                value.modelRetrievalResult.modelRetrievalState !is ModelRetrievalState.ModelLoading,
+                        showAlertDialog = value.modelRetrievalResult.showAlertDialog(),
                         clientMessage = message.trim(),
                         fabIcon = fabIcon,
                         snackbarMessage = LaunchedEffectResult(SnackbarData(message = value.error)),
@@ -92,11 +96,6 @@ class ChatViewModel(
 
     private fun dismissDialog() {
         _state.update { it.copy(showAlertDialog = true) }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        sttManager.cancel()
     }
 
     private fun dismissSnackbar() {

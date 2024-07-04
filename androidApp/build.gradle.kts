@@ -81,6 +81,10 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.androidx.compose.material.icons.extended)
 
+    implementation(libs.androidx.lifecycle.runtime.core)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+
     implementation(platform(libs.openai.client.bom))
     implementation(libs.openai.client)
     runtimeOnly(libs.ktor.client.okhttp)

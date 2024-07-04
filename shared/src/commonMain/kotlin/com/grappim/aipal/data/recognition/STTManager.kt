@@ -14,5 +14,9 @@ interface STTManager {
 
     fun stopListening()
 
-    fun cancel()
+    fun cleanup()
+
+    fun initialize()
+
+    fun resetToDefaultState()
 }

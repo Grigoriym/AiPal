@@ -36,7 +36,6 @@ import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -66,6 +65,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -78,24 +78,23 @@ import nl.marc_apps.tts.TextToSpeechEngine
 import nl.marc_apps.tts.rememberTextToSpeechOrNull
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ChatRoute(
     viewModel: ChatViewModel = koinViewModel(),
     goToSettings: () -> Unit,
     goToApiKeySetup: () -> Unit,
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val permissionState = rememberPermissionState(permission = Manifest.permission.RECORD_AUDIO)
     val textToSpeech = rememberTextToSpeechOrNull(TextToSpeechEngine.SystemDefault)
     val coroutineScope = rememberCoroutineScope()
     val keyboard = LocalSoftwareKeyboardController.current
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
     val listState = rememberLazyListState()
-    val snackbarHostSate =
-        remember {
-            SnackbarHostState()
-        }
+    val snackbarHostSate = remember {
+        SnackbarHostState()
+    }
 
     if (!permissionState.status.isGranted) {
         LaunchedEffect(true) {
@@ -114,14 +113,17 @@ fun ChatRoute(
                 )
             when (result) {
                 SnackbarResult.ActionPerformed -> {
-                    goToApiKeySetup()
-                    state.dismissSnackbar()
+                    goToAnotherScreen(action = {
+                        goToApiKeySetup()
+                        state.dismissSnackbar()
+                    }, state = state)
                 }
 
                 SnackbarResult.Dismissed -> {
                     snackbarHostSate.currentSnackbarData?.dismiss()
                 }
             }
+            state.acknowledgeError()
         }
     }
 
@@ -147,15 +149,15 @@ fun ChatRoute(
             PlatoTopBar(
                 title = "Chat",
                 actions = {
-                IconButton(
-                    onClick = {
-                        keyboard?.hide()
-                        goToSettings()
-                    },
-                ) {
-                    Icon(imageVector = Icons.Filled.Settings, contentDescription = "")
-                }
-            })
+                    IconButton(
+                        onClick = {
+                            keyboard?.hide()
+                            goToAnotherScreen(action = goToSettings, state = state)
+                        },
+                    ) {
+                        Icon(imageVector = Icons.Filled.Settings, contentDescription = "")
+                    }
+                })
         },
         modifier =
         Modifier
@@ -206,6 +208,18 @@ fun ChatRoute(
             }
         }
     }
+}
+
+/**
+ * For now I need to clear the state when we move to another screen to not
+ * show the snackbar again
+ */
+private fun goToAnotherScreen(
+    action: () -> Unit,
+    state: ChatState
+) {
+    state.acknowledgeError()
+    action()
 }
 
 @Composable

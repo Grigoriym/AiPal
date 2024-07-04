@@ -11,7 +11,7 @@ enum class CurrentSTTManager(
     ),
     Vosk(
         "Continuous speech recognition, does not require internet, " +
-                "must be downloaded beforehand (~50Mb)"
+                "MUST be downloaded beforehand (~50Mb)"
     ),
     ;
 
