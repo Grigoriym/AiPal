@@ -30,6 +30,7 @@ android {
         add("META-INF/DEPENDENCIES")
         add("META-INF/LICENSE.md")
         add("META-INF/LICENSE-notice.md")
+        add("META-INF/DEPENDENCIES")
     }
     signingConfigs {
         create("release") {

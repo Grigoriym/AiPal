@@ -1,5 +1,4 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
@@ -74,6 +73,7 @@ kotlin {
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             implementation(compose.materialIconsExtended)
+            implementation(compose.preview)
 
             implementation(project.dependencies.platform(libs.openai.client.bom))
             implementation(libs.openai.client)
@@ -114,6 +114,19 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
 
         isCoreLibraryDesugaringEnabled = true
+    }
+
+    buildFeatures {
+        compose = true
+    }
+
+    packaging.resources.excludes.apply {
+        add("META-INF/AL2.0")
+        add("META-INF/LGPL2.1")
+        add("META-INF/DEPENDENCIES")
+        add("META-INF/LICENSE.md")
+        add("META-INF/LICENSE-notice.md")
+        add("META-INF/DEPENDENCIES")
     }
 
     dependencies {

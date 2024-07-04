@@ -6,10 +6,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import com.grappim.aipal.uikit.AiPalTheme
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun PlatoIconButton(modifier: Modifier = Modifier, icon: ImageVector, onButtonClick: () -> Unit) {
@@ -25,7 +25,7 @@ fun PlatoIconButton(modifier: Modifier = Modifier, icon: ImageVector, onButtonCl
     }
 }
 
-@[Composable]
+@[Preview Composable]
 private fun PlatoIconButtonPreview() {
     AiPalTheme {
         PlatoIconButton(
