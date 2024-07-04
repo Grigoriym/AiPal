@@ -14,7 +14,5 @@ const val DEFAULT_SPELLING_CHECK_PROMPT = "Check the next message for any types 
         "and provide me only the correct answer and nothing else. If the sentence is fine just send me " +
         "that sentence that I have provided"
 
-const val DEFAULT_LANGUAGE = "de"
-
 const val DEFAULT_VOSK_SAMPLE_RATE = 16000.0f
 const val SAMPLE_RATE = 44100.0f
