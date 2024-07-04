@@ -5,8 +5,6 @@ interface AiPalRepo {
 
     suspend fun sendMessage(msg: String): Result<String>
 
-    fun setBehavior(msg: String)
-
     suspend fun translateMessage(msg: String): Result<String>
 
     suspend fun checkSpelling(msg: String): Result<String>

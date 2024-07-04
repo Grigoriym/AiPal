@@ -268,7 +268,7 @@ private fun ChatItem(
                 Text(text = message.message)
                 if (message.spellingCheck.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(4.dp))
-                    HorizontalDivider(color = Color.Blue, thickness = 1.dp)
+                    HorizontalDivider(color = Color.Green, thickness = 1.dp)
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(text = message.spellingCheck)
                 }
