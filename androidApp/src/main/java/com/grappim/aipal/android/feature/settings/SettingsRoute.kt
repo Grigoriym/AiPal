@@ -48,7 +48,7 @@ fun SettingsRoute(
                     .padding(horizontal = 16.dp),
         ) {
             PlatoTextButton(text = "Setup TTS", onClick = { context.startActivity(ttsIntent) })
-            PlatoTextButton(text = "Setup SST", onClick = goToSstSettings)
+            PlatoTextButton(text = "Setup STT", onClick = goToSstSettings)
             PlatoTextButton(text = "Setup Prompts", onClick = goToPrompts)
             PlatoTextButton(text = "Api Keys", onClick = goToApiKeysSettings)
 

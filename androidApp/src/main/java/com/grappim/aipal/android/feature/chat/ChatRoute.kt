@@ -1,15 +1,27 @@
 package com.grappim.aipal.android.feature.chat
 
 import android.Manifest
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,10 +36,10 @@ import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -44,41 +56,45 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.grappim.aipal.feature.chat.ChatMessageUI
 import com.grappim.aipal.feature.chat.ChatState
+import com.grappim.aipal.widgets.PlatoAlertDialog
 import com.grappim.aipal.widgets.PlatoTopBar
 import kotlinx.coroutines.launch
 import nl.marc_apps.tts.TextToSpeechEngine
 import nl.marc_apps.tts.rememberTextToSpeechOrNull
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ChatRoute(
     viewModel: ChatViewModel = koinViewModel(),
     goToSettings: () -> Unit,
     goToApiKeySetup: () -> Unit,
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val permissionState = rememberPermissionState(permission = Manifest.permission.RECORD_AUDIO)
     val textToSpeech = rememberTextToSpeechOrNull(TextToSpeechEngine.SystemDefault)
     val coroutineScope = rememberCoroutineScope()
     val keyboard = LocalSoftwareKeyboardController.current
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
     val listState = rememberLazyListState()
-    val snackbarHostSate =
-        remember {
-            SnackbarHostState()
-        }
+    val snackbarHostSate = remember {
+        SnackbarHostState()
+    }
 
     if (!permissionState.status.isGranted) {
         LaunchedEffect(true) {
@@ -97,14 +113,17 @@ fun ChatRoute(
                 )
             when (result) {
                 SnackbarResult.ActionPerformed -> {
-                    goToApiKeySetup()
-                    state.dismissSnackbar()
+                    goToAnotherScreen(action = {
+                        goToApiKeySetup()
+                        state.dismissSnackbar()
+                    }, state = state)
                 }
 
                 SnackbarResult.Dismissed -> {
                     snackbarHostSate.currentSnackbarData?.dismiss()
                 }
             }
+            state.acknowledgeError()
         }
     }
 
@@ -127,16 +146,18 @@ fun ChatRoute(
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostSate) },
         topBar = {
-            PlatoTopBar(title = "Chat", actions = {
-                IconButton(
-                    onClick = {
-                        keyboard?.hide()
-                        goToSettings()
-                    },
-                ) {
-                    Icon(imageVector = Icons.Filled.Settings, contentDescription = "")
-                }
-            })
+            PlatoTopBar(
+                title = "Chat",
+                actions = {
+                    IconButton(
+                        onClick = {
+                            keyboard?.hide()
+                            goToAnotherScreen(action = goToSettings, state = state)
+                        },
+                    ) {
+                        Icon(imageVector = Icons.Filled.Settings, contentDescription = "")
+                    }
+                })
         },
         modifier =
         Modifier
@@ -153,6 +174,12 @@ fun ChatRoute(
             )
         },
     ) { paddingValues ->
+        PlatoAlertDialog(
+            text = "Please wait. The STT model is being downloaded and prepared.",
+            showAlertDialog = state.showAlertDialog,
+            onDismissRequest = state.onDismissDialog
+        )
+
         LazyColumn(
             modifier =
             Modifier
@@ -181,6 +208,18 @@ fun ChatRoute(
             }
         }
     }
+}
+
+/**
+ * For now I need to clear the state when we move to another screen to not
+ * show the snackbar again
+ */
+private fun goToAnotherScreen(
+    action: () -> Unit,
+    state: ChatState
+) {
+    state.acknowledgeError()
+    action()
 }
 
 @Composable
@@ -247,6 +286,7 @@ private fun ChatBox(
 ) {
     Row(
         modifier = modifier.padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         TextField(
             modifier = Modifier.weight(1f),
@@ -266,15 +306,13 @@ private fun ChatBox(
                 }
             },
         )
-        IconButton(
-            modifier =
-            Modifier
-                .clip(CircleShape)
-                .align(Alignment.CenterVertically),
-            onClick = state.toggleSTT,
-        ) {
-            Icon(imageVector = state.fabIcon, contentDescription = "")
-        }
+
+        AnimatedMicrophoneButton(
+            modifier = Modifier
+                .padding(start = 8.dp),
+            state = state
+        )
+
         IconButton(
             modifier =
             Modifier
@@ -284,6 +322,79 @@ private fun ChatBox(
             enabled = state.clientMessage.isNotEmpty()
         ) {
             Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = "")
+        }
+    }
+}
+
+@Composable
+private fun AnimatedMicrophoneButton(
+    modifier: Modifier = Modifier,
+    state: ChatState
+) {
+    val color by animateColorAsState(
+        targetValue = when {
+            state.isDownloading -> Color(0xFF039BCF)
+            state.isListening -> Color.Green
+            state.isPreparingModel -> Color(0xFFFFA500)
+            else -> LocalContentColor.current
+        }, label = "mic color"
+    )
+    val scale by animateFloatAsState(
+        targetValue = if (state.isPreparingModel || state.isDownloading) 1.2f else 1f, label = ""
+    )
+
+    val infiniteTransition = rememberInfiniteTransition(label = "")
+
+    val borderWidth by infiniteTransition.animateFloat(
+        initialValue = 2f,
+        targetValue = 4f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000),
+            repeatMode = RepeatMode.Reverse
+        ), label = ""
+    )
+
+    val rotationAngle by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = LinearEasing)
+        ), label = ""
+    )
+
+    Box(
+        modifier = modifier
+            .size(40.dp)
+            .scale(scale)
+    ) {
+        if (state.isListening || state.isPreparingModel || state.isDownloading) {
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                rotate(if (state.isPreparingModel) rotationAngle else 0f) {
+                    drawCircle(
+                        color = color,
+                        style = Stroke(width = borderWidth.dp.toPx()),
+                        radius = size.minDimension / 2
+                    )
+                }
+            }
+        }
+
+        IconButton(
+            modifier =
+            Modifier
+                .clip(CircleShape)
+                .align(Alignment.Center),
+            onClick = {
+                state.toggleSTT()
+            },
+        ) {
+            Icon(
+                modifier = Modifier
+                    .size(24.dp),
+                imageVector = state.fabIcon,
+                contentDescription = "",
+                tint = color
+            )
         }
     }
 }

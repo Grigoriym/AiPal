@@ -79,6 +79,11 @@ kotlin {
             implementation(libs.openai.client)
             runtimeOnly(libs.ktor.client.okhttp)
 
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.apache)
+
+            implementation(libs.okio)
+
             // Temporarily added so that with ios the project can be built
             // https://github.com/cashapp/sqldelight/issues/4357#issuecomment-1839905700
             implementation(libs.stately.common)

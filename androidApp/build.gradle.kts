@@ -24,10 +24,12 @@ android {
         compose = true
         buildConfig = true
     }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
+    packaging.resources.excludes.apply {
+        add("META-INF/AL2.0")
+        add("META-INF/LGPL2.1")
+        add("META-INF/DEPENDENCIES")
+        add("META-INF/LICENSE.md")
+        add("META-INF/LICENSE-notice.md")
     }
     signingConfigs {
         create("release") {
@@ -78,6 +80,10 @@ dependencies {
     debugImplementation(libs.compose.ui.tooling)
     implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.androidx.compose.material.icons.extended)
+
+    implementation(libs.androidx.lifecycle.runtime.core)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
 
     implementation(platform(libs.openai.client.bom))
     implementation(libs.openai.client)

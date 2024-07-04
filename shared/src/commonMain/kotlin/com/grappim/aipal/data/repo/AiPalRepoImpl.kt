@@ -7,7 +7,7 @@ import com.aallam.openai.api.logging.LogLevel
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.LoggingConfig
 import com.aallam.openai.client.OpenAI
-import com.grappim.aipal.core.DEFAULT_BEHAVIOR
+import com.aallam.openai.client.RetryStrategy
 import com.grappim.aipal.data.exceptions.OpenAiEmptyApiKeyException
 import com.grappim.aipal.data.local.LocalDataStorage
 import com.grappim.aipal.data.model.Message
@@ -19,30 +19,31 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import org.lighthousegames.logging.logging
+import kotlin.time.Duration.Companion.seconds
 
 class AiPalRepoImpl(
     private val localDataStorage: LocalDataStorage,
 ) : AiPalRepo {
     private val messages = mutableListOf<Message>()
 
-    private val log = logging()
+    private val logging = logging()
 
     private val openAiFlow: Flow<OpenAI?> =
         localDataStorage.openAiApiKey
             .map { value ->
                 if (value.isEmpty()) return@map null
                 OpenAI(
+                    retry = RetryStrategy(
+                        maxRetries = 0,
+                        maxDelay = 30.seconds
+                    ),
                     token = value,
                     logging =
-                        LoggingConfig(
-                            logLevel = LogLevel.All,
-                        ),
+                    LoggingConfig(
+                        logLevel = LogLevel.All,
+                    ),
                 )
             }
-
-    init {
-        setBehavior(DEFAULT_BEHAVIOR)
-    }
 
     private suspend fun getOpenAi(): OpenAI? = openAiFlow.firstOrNull()
 
@@ -72,6 +73,7 @@ class AiPalRepoImpl(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
+                logging.e { e }
                 Result.failure(e)
             }
         }
@@ -119,7 +121,7 @@ class AiPalRepoImpl(
                         .message
                 val result = receivedMessage.content ?: ""
                 messages.add(Message(result, Role.Assistant))
-                log.d { result }
+                logging.d { result }
                 return@withContext Result.success(result)
             } catch (e: CancellationException) {
                 throw e
