@@ -15,16 +15,16 @@ import androidx.core.view.WindowCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.grappim.aipal.data.model.DarkThemeConfig
 import com.grappim.aipal.android.feature.chat.ChatRoute
-import com.grappim.aipal.android.feature.stt.SttSettingsRoute
 import com.grappim.aipal.android.feature.prompts.PromptsRoute
 import com.grappim.aipal.android.feature.settings.SettingsRoute
 import com.grappim.aipal.android.feature.settings.ai.AiSettingsRoute
 import com.grappim.aipal.android.feature.settings.apiKeys.GptSettingsRoute
+import com.grappim.aipal.android.feature.stt.SttSettingsRoute
 import com.grappim.aipal.android.nav.NavDestinations
-import com.grappim.aipal.android.uikit.MyApplicationTheme
+import com.grappim.aipal.data.model.DarkThemeConfig
 import com.grappim.aipal.feature.main.MainState
+import com.grappim.aipal.uikit.AiPalTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
             val state by viewModel.state.collectAsState()
             val darkTheme = shouldUseDarkTheme(mainActivityViewState = state)
 
-            MyApplicationTheme(
+            AiPalTheme(
                 darkTheme = darkTheme
             ) {
                 Surface(

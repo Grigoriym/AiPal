@@ -33,6 +33,7 @@ import androidx.compose.material.icons.automirrored.filled.Backspace
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Spellcheck
 import androidx.compose.material.icons.filled.Translate
@@ -72,6 +73,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.grappim.aipal.feature.chat.ChatMessageUI
 import com.grappim.aipal.feature.chat.ChatState
 import com.grappim.aipal.widgets.PlatoAlertDialog
+import com.grappim.aipal.widgets.PlatoIconButton
 import com.grappim.aipal.widgets.PlatoTopBar
 import kotlinx.coroutines.launch
 import nl.marc_apps.tts.TextToSpeechEngine
@@ -103,9 +105,7 @@ fun ChatRoute(
     }
 
     LaunchedEffect(state.snackbarMessage) {
-        if (state.snackbarMessage.data.message
-                .isNotEmpty()
-        ) {
+        if (state.snackbarMessage.data.message.isNotEmpty()) {
             val result =
                 snackbarHostSate.showSnackbar(
                     message = state.snackbarMessage.data.message,
@@ -149,14 +149,19 @@ fun ChatRoute(
             PlatoTopBar(
                 title = "Chat",
                 actions = {
-                    IconButton(
-                        onClick = {
+                    PlatoIconButton(
+                        icon = Icons.Filled.Pause,
+                        onButtonClick = {
+                            runCatching {
+                                textToSpeech?.stop()
+                            }
+                        })
+                    PlatoIconButton(
+                        icon = Icons.Filled.Settings,
+                        onButtonClick = {
                             keyboard?.hide()
                             goToAnotherScreen(action = goToSettings, state = state)
-                        },
-                    ) {
-                        Icon(imageVector = Icons.Filled.Settings, contentDescription = "")
-                    }
+                        })
                 })
         },
         modifier =
