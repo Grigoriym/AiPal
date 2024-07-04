@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
+import com.grappim.aipal.core.DEFAULT_AI_ANSWER_FIX_PROMPT
 import com.grappim.aipal.core.DEFAULT_BEHAVIOR
 import com.grappim.aipal.core.DEFAULT_MODEL
 import com.grappim.aipal.core.DEFAULT_SPELLING_CHECK_PROMPT
@@ -28,6 +29,13 @@ class LocalDataStorageImpl(
         dataStore.data
             .map { value: Preferences ->
                 value[tempKey] ?: DEFAULT_TEMPERATURE
+            }
+
+    private val aiAnswerFixPromptKey = stringPreferencesKey("ai_answer_fix_prompt_key")
+    override val aiAnswerFixPrompt: Flow<String> =
+        dataStore.data
+            .map { value: Preferences ->
+                value[aiAnswerFixPromptKey] ?: DEFAULT_AI_ANSWER_FIX_PROMPT
             }
 
     private val sstManagerKey = stringPreferencesKey("sst_manager_key")
@@ -147,6 +155,12 @@ class LocalDataStorageImpl(
     override suspend fun setSpellingPrompt(prompt: String) {
         dataStore.edit { settings ->
             settings[spellingPromptKey] = prompt
+        }
+    }
+
+    override suspend fun setAiAnswerFixPrompt(prompt: String) {
+        dataStore.edit { settings ->
+            settings[aiAnswerFixPromptKey] = prompt
         }
     }
 }

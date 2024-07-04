@@ -12,4 +12,8 @@ data class PromptsState(
     val spellingCheckPrompt: String = "",
     val onSetSpelling: (String) -> Unit,
     val saveSpelling: () -> Unit,
+
+    val aiAnswerFixPrompt: String = "",
+    val onSetAiAnswerFixPrompt: (String) -> Unit,
+    val saveAiAnswerFixPrompt: () -> Unit,
 )

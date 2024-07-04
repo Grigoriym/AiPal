@@ -16,6 +16,7 @@ interface LocalDataStorage {
     val currentLanguage: Flow<SupportedLanguage>
     val sttManager: Flow<CurrentSTTManager>
     val spellingPrompt: Flow<String>
+    val aiAnswerFixPrompt: Flow<String>
 
     suspend fun setCurrentGptModel(model: String)
 
@@ -34,4 +35,5 @@ interface LocalDataStorage {
     suspend fun setCurrentLanguage(language: SupportedLanguage)
     suspend fun setSttManager(sstManager: CurrentSTTManager)
     suspend fun setSpellingPrompt(prompt: String)
+    suspend fun setAiAnswerFixPrompt(prompt: String)
 }

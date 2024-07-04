@@ -11,5 +11,6 @@ data class Message(
 enum class MessageType {
     BEHAVIOR,
     LANGUAGE,
+    AI_FIX,
     OTHER
 }

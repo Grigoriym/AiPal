@@ -96,6 +96,26 @@ class AiPalRepoImpl(
                     }
                 }
             }
+            launch {
+                localDataStorage.aiAnswerFixPrompt.collect { value ->
+                    val presentBehavior = messages.find {
+                        it.role == Role.System &&
+                                it.messageType == MessageType.AI_FIX
+                    }
+                    if (presentBehavior == null) {
+                        messages.add(
+                            Message(
+                                text = value,
+                                role = Role.System,
+                                messageType = MessageType.AI_FIX
+                            )
+                        )
+                    } else {
+                        val newBehavior = presentBehavior.copy(text = value)
+                        messages[messages.indexOf(presentBehavior)] = newBehavior
+                    }
+                }
+            }
         }
     }
 
