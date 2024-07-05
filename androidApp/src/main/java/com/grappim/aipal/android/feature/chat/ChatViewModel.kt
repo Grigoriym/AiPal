@@ -44,7 +44,8 @@ class ChatViewModel(
                 dismissSnackbar = ::dismissSnackbar,
                 onDismissDialog = ::dismissDialog,
                 acknowledgeError = ::acknowledgeError,
-                onSpellCheck = ::checkSpelling
+                onSpellCheck = ::checkSpelling,
+                onShowPermissionsAlertDialog = ::onShowPermissionsAlertDialog
             ),
         )
     val state = _state.asStateFlow()
@@ -62,6 +63,15 @@ class ChatViewModel(
                         updateSSTManager(newStt)
                     }
             }
+        }
+    }
+
+    private fun onShowPermissionsAlertDialog(show: Boolean, text: String?) {
+        _state.update {
+            it.copy(
+                showProvidePermissionsAlertDialog = show,
+                permissionsAlertDialogText = text ?: ""
+            )
         }
     }
 

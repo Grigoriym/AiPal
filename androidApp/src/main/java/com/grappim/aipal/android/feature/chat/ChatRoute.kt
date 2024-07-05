@@ -1,6 +1,12 @@
+@file:OptIn(ExperimentalPermissionsApi::class)
+
 package com.grappim.aipal.android.feature.chat
 
 import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -26,7 +32,6 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Backspace
@@ -56,20 +61,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 import com.grappim.aipal.feature.chat.ChatMessageUI
 import com.grappim.aipal.feature.chat.ChatState
 import com.grappim.aipal.widgets.PlatoAlertDialog
@@ -97,6 +104,8 @@ fun ChatRoute(
     val snackbarHostSate = remember {
         SnackbarHostState()
     }
+    val context = LocalContext.current
+    val activity = context as Activity
 
     if (!permissionState.status.isGranted) {
         LaunchedEffect(true) {
@@ -176,6 +185,7 @@ fun ChatRoute(
                     .fillMaxWidth(),
                 state = state,
                 viewModel = viewModel,
+                permissionState = permissionState
             )
         },
     ) { paddingValues ->
@@ -183,6 +193,22 @@ fun ChatRoute(
             text = "Please wait. The STT model is being downloaded and prepared.",
             showAlertDialog = state.showAlertDialog,
             onDismissRequest = state.onDismissDialog
+        )
+
+        PlatoAlertDialog(text = state.permissionsAlertDialogText,
+            showAlertDialog = state.showProvidePermissionsAlertDialog,
+            confirmButtonText = "Ok",
+            onDismissRequest = {
+                state.onShowPermissionsAlertDialog(false, null)
+            },
+            onConfirmButtonClicked = {
+                openAppSettings(activity)
+                state.onShowPermissionsAlertDialog(false, null)
+            },
+            dismissButtonText = "Cancel",
+            onDismissButtonClicked = {
+                state.onShowPermissionsAlertDialog(false, null)
+            }
         )
 
         LazyColumn(
@@ -216,6 +242,14 @@ fun ChatRoute(
             }
         }
     }
+}
+
+private fun openAppSettings(activity: Activity) {
+    val intent = Intent(
+        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+        Uri.fromParts("package", activity.packageName, null)
+    )
+    activity.startActivity(intent)
 }
 
 /**
@@ -301,6 +335,7 @@ private fun ChatBox(
     modifier: Modifier = Modifier,
     state: ChatState,
     viewModel: ChatViewModel,
+    permissionState: PermissionState
 ) {
     Row(
         modifier = modifier.padding(16.dp),
@@ -328,26 +363,23 @@ private fun ChatBox(
         AnimatedMicrophoneButton(
             modifier = Modifier
                 .padding(start = 8.dp),
-            state = state
+            state = state,
+            permissionState = permissionState
         )
 
-        IconButton(
-            modifier =
-            Modifier
-                .clip(CircleShape)
-                .align(Alignment.CenterVertically),
-            onClick = { viewModel.sendMessage() },
-            enabled = state.clientMessage.isNotEmpty()
-        ) {
-            Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = "")
-        }
+        PlatoIconButton(
+            icon = Icons.AutoMirrored.Filled.Send,
+            onButtonClick = { viewModel.sendMessage() },
+            enabled = state.clientMessage.isNotEmpty(),
+        )
     }
 }
 
 @Composable
 private fun AnimatedMicrophoneButton(
     modifier: Modifier = Modifier,
-    state: ChatState
+    state: ChatState,
+    permissionState: PermissionState
 ) {
     val color by animateColorAsState(
         targetValue = when {
@@ -397,22 +429,22 @@ private fun AnimatedMicrophoneButton(
             }
         }
 
-        IconButton(
-            modifier =
-            Modifier
-                .clip(CircleShape)
-                .align(Alignment.Center),
-            onClick = {
-                state.toggleSTT()
+        PlatoIconButton(
+            icon = state.fabIcon,
+            onButtonClick = {
+                if (permissionState.status.isGranted) {
+                    state.toggleSTT()
+                } else {
+                    val textToShow = if (permissionState.status.shouldShowRationale) {
+                        "The Microphone is important for this app. Please grant the permission."
+                    } else {
+                        "Microphone permission required for this feature to be available. " +
+                                "Please grant the permission"
+                    }
+                    state.onShowPermissionsAlertDialog(true, textToShow)
+                }
             },
-        ) {
-            Icon(
-                modifier = Modifier
-                    .size(24.dp),
-                imageVector = state.fabIcon,
-                contentDescription = "",
-                tint = color
-            )
-        }
+            tint = color
+        )
     }
 }
