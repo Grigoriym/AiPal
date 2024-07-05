@@ -22,7 +22,11 @@ data class ChatState(
     val showAlertDialog: Boolean = false,
     val onDismissDialog: () -> Unit,
     val acknowledgeError: () -> Unit,
-    val onSpellCheck: (ChatMessageUI) -> Unit
+    val onSpellCheck: (ChatMessageUI) -> Unit,
+
+    val showProvidePermissionsAlertDialog: Boolean = false,
+    val permissionsAlertDialogText: String = "",
+    val onShowPermissionsAlertDialog: (show: Boolean, text: String?) -> Unit,
 ) {
     fun getMessagesForUi() = listMessages.filter { it.message.isNotEmpty() }
 }
