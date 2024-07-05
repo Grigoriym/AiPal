@@ -35,6 +35,9 @@ logging = "1.5.0"
 ksp = "2.0.0-1.0.22"
 compose-plugin = "1.6.11"
 
+#temp
+statelyCommon = "2.0.5"
+
 [libraries]
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin-compose-multiplatform" }
@@ -85,6 +88,9 @@ android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs
 logging = { module = "org.lighthousegames:logging", version.ref = "logging" }
 
 voskAndroid = { module = "com.alphacephei:vosk-android", version.ref = "vosk" }
+
+#temp
+stately-common = { module = "co.touchlab:stately-common", version.ref = "statelyCommon" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

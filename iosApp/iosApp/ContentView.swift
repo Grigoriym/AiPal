@@ -1,16 +1,20 @@
 import SwiftUI
-import shared
+import UIKit
+import shared.com.grappim.aipal
 
-struct ContentView: View {
-	let greet = Greeting().greet()
+struct ContentView: UIViewControllerRepresentable {
 
-	var body: some View {
-		Text(greet)
-	}
+    func makeUIViewController(context: Context) -> some UIViewController {
+        MainViewControllerKt.MainViewController()
+    }
+    
+    func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
+        
+    }
 }
 
-struct ContentView_Previews: PreviewProvider {
-	static var previews: some View {
-		ContentView()
-	}
+struct ContentView: View {
+    var body: some View {
+        ComposeView().ignoreSafeArea(.keyboard)
+    }
 }

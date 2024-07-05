@@ -1,3 +1,4 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
@@ -70,7 +71,7 @@ kotlin {
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.ui)
-            implementation(compose.components.resources)
+//            implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             implementation(compose.materialIconsExtended)
 
@@ -81,6 +82,10 @@ kotlin {
             implementation(libs.ktor.client.core)
 
             implementation(libs.okio)
+
+            // Temporarily added so that with ios the project can be built
+            // https://github.com/cashapp/sqldelight/issues/4357#issuecomment-1839905700
+            implementation(libs.stately.common)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -130,5 +135,17 @@ android {
 
     dependencies {
         coreLibraryDesugaring(libs.android.desugarJdkLibs)
+    }
+}
+
+compose.desktop {
+    application {
+        mainClass = "MainKt"
+
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
+            packageName = "com.grappim.aipal"
+            packageVersion = "1.0.0"
+        }
     }
 }
