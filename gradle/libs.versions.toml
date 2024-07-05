@@ -11,7 +11,6 @@ atomicfu = "0.24.0"
 ktorClientCore = "2.3.12"
 okio = "3.9.0"
 uuid = "0.8.4"
-voyager = "1.1.0-beta02"
 
 agp = "8.5.0"
 
@@ -24,6 +23,7 @@ androidx-activityCompose = "1.8.0"
 androidDesugarJdkLibs = "2.0.4"
 navigation = "2.7.7"
 lifecycle = "2.8.3"
+navigationCompose = "2.7.0-alpha07"
 
 accompanist = "0.34.0"
 
@@ -56,7 +56,6 @@ ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorCli
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktorClientCore" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
-voyager = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
 
 androidx-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "datastore-prefs" }
 androidx-datastore-prefs = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore-prefs" }
@@ -88,6 +87,8 @@ android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs
 logging = { module = "org.lighthousegames:logging", version.ref = "logging" }
 
 voskAndroid = { module = "com.alphacephei:vosk-android", version.ref = "vosk" }
+
+navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 
 #temp
 stately-common = { module = "co.touchlab:stately-common", version.ref = "statelyCommon" }

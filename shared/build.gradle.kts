@@ -1,4 +1,5 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
@@ -10,33 +11,16 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.ksp)
+//    alias(libs.plugins.ksp)
 }
 
 kotlin {
     androidTarget {
-        tasks.withType<KotlinJvmCompile>().configureEach {
-            compilerOptions {
-                jvmTarget.set(JvmTarget.JVM_1_8)
-            }
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-
-//    @OptIn(ExperimentalWasmDsl::class)
-//    wasmJs {
-//        moduleName = "shared"
-//        browser {
-//            commonWebpackConfig {
-//                outputFileName = "aipal.js"
-//            }
-//        }
-//        binaries.executable()
-//    }
-
-//    js {
-//        browser()
-//        binaries.executable()
-//    }
 
     jvm("desktop")
 
@@ -46,7 +30,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach {
         it.binaries.framework {
-            baseName = "shared"
+            baseName = "ComposeApp"
             isStatic = true
         }
     }
@@ -61,7 +45,6 @@ kotlin {
             implementation(libs.kotlinx.datetime)
 
             implementation(libs.uuid)
-            implementation(libs.voyager)
             api(libs.logging)
 
             api(libs.androidx.datastore.preferences.core)
@@ -71,9 +54,10 @@ kotlin {
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.ui)
-//            implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             implementation(compose.materialIconsExtended)
+
+            implementation(libs.navigation.compose)
 
             implementation(project.dependencies.platform(libs.openai.client.bom))
             implementation(libs.openai.client)
@@ -114,8 +98,8 @@ android {
         minSdk = 24
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
 
         isCoreLibraryDesugaringEnabled = true
     }

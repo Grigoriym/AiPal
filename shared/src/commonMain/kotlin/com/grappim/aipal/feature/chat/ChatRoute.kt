@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,51 +27,56 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
+import com.grappim.aipal.widgets.PlatoIconButton
 import com.grappim.aipal.widgets.PlatoTopBar
 
-class ChatScreen : Screen {
-    @Composable
-    override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
-        val listState = rememberLazyListState()
-        val keyboard = LocalSoftwareKeyboardController.current
+@Composable
+fun ChatRoute(
+    goToSettings: () -> Unit,
+    goToApiKeySetup: () -> Unit,
+) {
+    val listState = rememberLazyListState()
+    val keyboard = LocalSoftwareKeyboardController.current
 
-        Scaffold(
-            modifier = Modifier.statusBarsPadding()
-                .navigationBarsPadding()
-                .imePadding(),
-            topBar = {
-                PlatoTopBar(title = "Chat", actions = {
-                    IconButton(
-                        onClick = {
+    Scaffold(
+        modifier = Modifier.statusBarsPadding()
+            .navigationBarsPadding()
+            .imePadding(),
+        topBar = {
+            PlatoTopBar(
+                title = "Chat",
+                actions = {
+                    PlatoIconButton(
+                        icon = Icons.Filled.Pause,
+                        onButtonClick = {
+
+                        })
+                    PlatoIconButton(
+                        icon = Icons.Filled.Settings,
+                        onButtonClick = {
                             keyboard?.hide()
-                        },
-                    ) {
-                        Icon(imageVector = Icons.Filled.Settings, contentDescription = "")
-                    }
+                            goToSettings()
+                        })
                 })
-            },
-            bottomBar = {
-                ChatBox(modifier = Modifier.fillMaxWidth())
-            }
-        ) { padding ->
-            LazyColumn(
-                modifier = Modifier.padding(padding)
-                    .fillMaxWidth(),
-                state = listState
-            ) {
+        },
+        bottomBar = {
+            ChatBox(modifier = Modifier.fillMaxWidth())
+        }
+    ) { padding ->
+        LazyColumn(
+            modifier = Modifier.padding(padding)
+                .fillMaxWidth(),
+            state = listState
+        ) {
 
-            }
         }
     }
 }
 
 @Composable
 private fun ChatBox(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+//    state: ChatState
 ) {
     Row(
         modifier = modifier.padding(16.dp),
