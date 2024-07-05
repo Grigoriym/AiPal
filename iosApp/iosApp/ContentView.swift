@@ -1,8 +1,8 @@
 import SwiftUI
 import UIKit
-import shared.com.grappim.aipal
+import Shared
 
-struct ContentView: UIViewControllerRepresentable {
+struct ComposeView: UIViewControllerRepresentable {
 
     func makeUIViewController(context: Context) -> some UIViewController {
         MainViewControllerKt.MainViewController()
@@ -15,6 +15,7 @@ struct ContentView: UIViewControllerRepresentable {
 
 struct ContentView: View {
     var body: some View {
-        ComposeView().ignoreSafeArea(.keyboard)
+        ComposeView()
+                .ignoresSafeArea(.keyboard) // Compose has own keyboard handler
     }
 }
