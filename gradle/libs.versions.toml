@@ -10,7 +10,6 @@ atomicfu = "0.24.0"
 
 ktorClientCore = "2.3.12"
 okio = "3.9.0"
-statelyCommon = "2.0.5"
 uuid = "0.8.4"
 voyager = "1.1.0-beta02"
 
@@ -48,10 +47,11 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotl
 kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
 kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
 
-ktor-client-apache = { module = "io.ktor:ktor-client-apache", version.ref = "ktorClientCore" }
+ktor-client-apache = { module = "io.ktor:ktor-client-apache5", version.ref = "ktorClientCore" }
+
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientCore" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktorClientCore" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
-stately-common = { module = "co.touchlab:stately-common", version.ref = "statelyCommon" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 voyager = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
 

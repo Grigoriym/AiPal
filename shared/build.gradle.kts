@@ -39,16 +39,16 @@ kotlin {
 
     jvm("desktop")
 
-//    listOf(
-//        iosX64(),
-//        iosArm64(),
-//        iosSimulatorArm64()
-//    ).forEach {
-//        it.binaries.framework {
-//            baseName = "shared"
-//            isStatic = true
-//        }
-//    }
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach {
+        it.binaries.framework {
+            baseName = "shared"
+            isStatic = true
+        }
+    }
 
     sourceSets {
         commonMain.dependencies {
@@ -73,28 +73,27 @@ kotlin {
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             implementation(compose.materialIconsExtended)
-            implementation(compose.preview)
 
             implementation(project.dependencies.platform(libs.openai.client.bom))
             implementation(libs.openai.client)
             runtimeOnly(libs.ktor.client.okhttp)
 
             implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.apache)
 
             implementation(libs.okio)
-
-            // Temporarily added so that with ios the project can be built
-            // https://github.com/cashapp/sqldelight/issues/4357#issuecomment-1839905700
-            implementation(libs.stately.common)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+        }
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
         }
         androidMain.dependencies {
             implementation(libs.koin.android)
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
+
+            implementation(libs.ktor.client.apache)
         }
         val desktopMain by getting
         desktopMain.dependencies {
