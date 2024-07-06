@@ -232,9 +232,7 @@ fun ChatRoute(
                     onMessageCopy = { text ->
                         clipboardManager.setText(AnnotatedString(text))
                     },
-                    onTranslate = { chatMessage ->
-                        viewModel.translateMessage(chatMessage)
-                    },
+                    onTranslate = state.onTranslateMessage,
                     onSpellCheck = { chatMessage ->
                         state.onSpellCheck(chatMessage)
                     }
@@ -354,9 +352,10 @@ private fun ChatBox(
                 disabledIndicatorColor = Color.Transparent,
             ),
             trailingIcon = {
-                IconButton(onClick = state.onMessageClear) {
-                    Icon(imageVector = Icons.AutoMirrored.Filled.Backspace, contentDescription = "")
-                }
+                PlatoIconButton(
+                    icon = Icons.AutoMirrored.Filled.Backspace,
+                    onButtonClick = state.onMessageClear
+                )
             },
         )
 
@@ -369,7 +368,7 @@ private fun ChatBox(
 
         PlatoIconButton(
             icon = Icons.AutoMirrored.Filled.Send,
-            onButtonClick = { viewModel.sendMessage() },
+            onButtonClick = state.onSendMessage,
             enabled = state.clientMessage.isNotEmpty(),
         )
     }

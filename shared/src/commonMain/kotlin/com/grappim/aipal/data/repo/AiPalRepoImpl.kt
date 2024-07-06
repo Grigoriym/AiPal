@@ -191,6 +191,7 @@ class AiPalRepoImpl(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
+                logging.e { e }
                 Result.failure(e)
             }
         }

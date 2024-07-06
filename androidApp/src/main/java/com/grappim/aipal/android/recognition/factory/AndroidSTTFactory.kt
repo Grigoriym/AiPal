@@ -4,17 +4,18 @@ import com.grappim.aipal.android.recognition.android.AndroidSSTManager
 import com.grappim.aipal.android.recognition.vosk.VoskSttManager
 import com.grappim.aipal.data.recognition.CurrentSTTManager
 import com.grappim.aipal.data.recognition.STTManager
+import com.grappim.aipal.data.recognition.STTFactory
 import org.lighthousegames.logging.logging
 
-class STTFactory(
+class AndroidSTTFactory(
     private val androidSSTManagerFactory: () -> AndroidSSTManager,
     private val voskSttManagerFactory: () -> VoskSttManager
-) {
+) : STTFactory {
 
     private var androidManager: AndroidSSTManager? = null
     private var voskManager: VoskSttManager? = null
 
-    fun getSSTManager(currentSTTManager: CurrentSTTManager): STTManager {
+    override fun getSSTManager(currentSTTManager: CurrentSTTManager): STTManager {
         logging().d { "Now you have chosen: $currentSTTManager" }
         val manager = when (currentSTTManager) {
             CurrentSTTManager.Android -> getAndroidManager()

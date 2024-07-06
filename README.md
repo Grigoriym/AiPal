@@ -32,6 +32,8 @@
 5. Language Chooser (WIP)
 
 ## Helpful projects
+Key-Value dataStore for Kmm: https://github.com/russhwolf/multiplatform-settings
+
 https://github.com/aallam/openai-kotlin
 
 https://github.com/alphacep/vosk-android-demo

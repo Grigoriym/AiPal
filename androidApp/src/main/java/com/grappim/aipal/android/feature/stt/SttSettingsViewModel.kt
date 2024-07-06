@@ -5,12 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.grappim.aipal.android.files.vosk.VoskModelAvailability
 import com.grappim.aipal.android.recognition.Downloadable
 import com.grappim.aipal.android.recognition.ModelAvailabilityRetrieval
-import com.grappim.aipal.android.recognition.factory.STTFactory
 import com.grappim.aipal.core.LaunchedEffectResult
 import com.grappim.aipal.core.SupportedLanguage
 import com.grappim.aipal.data.local.LocalDataStorage
 import com.grappim.aipal.data.recognition.CurrentSTTManager
 import com.grappim.aipal.data.recognition.STTManager
+import com.grappim.aipal.data.recognition.STTFactory
 import com.grappim.aipal.feature.chat.SnackbarData
 import com.grappim.aipal.utils.runAs
 import kotlinx.coroutines.Job
