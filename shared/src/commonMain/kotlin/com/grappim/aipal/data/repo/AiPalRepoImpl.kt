@@ -15,6 +15,7 @@ import com.grappim.aipal.data.model.MessageType
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -190,6 +191,7 @@ class AiPalRepoImpl(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
+                logging.e { e }
                 Result.failure(e)
             }
         }

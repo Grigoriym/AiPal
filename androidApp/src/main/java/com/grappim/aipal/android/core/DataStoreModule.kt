@@ -25,7 +25,6 @@ val dataStoreModule =
             val context = get<Context>()
             getAndroidDataStore(context)
         }
-        single<LocalDataStorage> { LocalDataStorageImpl(get<DataStore<Preferences>>()) }
         single<FileDownloader> { FileDownloaderImpl() }
         single<FileUnzipManager> { FileUnzipManagerImpl() }
         single<FolderPathManager> { FolderPathManagerImpl(get<Context>()) }

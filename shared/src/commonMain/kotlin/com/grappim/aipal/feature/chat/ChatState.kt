@@ -27,6 +27,9 @@ data class ChatState(
     val showProvidePermissionsAlertDialog: Boolean = false,
     val permissionsAlertDialogText: String = "",
     val onShowPermissionsAlertDialog: (show: Boolean, text: String?) -> Unit,
+
+    val onSendMessage: () -> Unit,
+    val onTranslateMessage: (ChatMessageUI) -> Unit
 ) {
     fun getMessagesForUi() = listMessages.filter { it.message.isNotEmpty() }
 }

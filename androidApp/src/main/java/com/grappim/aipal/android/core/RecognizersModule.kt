@@ -7,11 +7,12 @@ import com.grappim.aipal.android.files.vosk.VoskModelCheck
 import com.grappim.aipal.android.recognition.android.AndroidSSTManager
 import com.grappim.aipal.android.recognition.android.SpeechRecognitionWrapper
 import com.grappim.aipal.android.recognition.android.SpeechRecognitionWrapperImpl
-import com.grappim.aipal.android.recognition.factory.STTFactory
+import com.grappim.aipal.android.recognition.factory.AndroidSTTFactory
 import com.grappim.aipal.android.recognition.vosk.RecognitionMessageDecoder
 import com.grappim.aipal.android.recognition.vosk.RecognitionMessageDecoderImpl
 import com.grappim.aipal.android.recognition.vosk.VoskSttManager
 import com.grappim.aipal.data.local.LocalDataStorage
+import com.grappim.aipal.data.recognition.STTFactory
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 
@@ -36,8 +37,8 @@ val recognizersModule =
             )
         }
 
-        single {
-            STTFactory(
+        single<STTFactory> {
+            AndroidSTTFactory(
                 androidSSTManagerFactory = {
                     get<AndroidSSTManager>()
                 },

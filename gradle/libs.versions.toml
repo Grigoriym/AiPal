@@ -1,6 +1,6 @@
 [versions]
 koin = "3.5.6"
-koin-compose-multiplatform = "1.1.5"
+koin-compose-multiplatform = "1.2.0-Beta4"
 
 kotlin = "2.0.0"
 kotlin-serialization = "1.6.3"
@@ -10,9 +10,8 @@ atomicfu = "0.24.0"
 
 ktorClientCore = "2.3.12"
 okio = "3.9.0"
-statelyCommon = "2.0.5"
+permissionsCompose = "0.18.0"
 uuid = "0.8.4"
-voyager = "1.1.0-beta02"
 
 agp = "8.5.0"
 
@@ -25,10 +24,13 @@ androidx-activityCompose = "1.8.0"
 androidDesugarJdkLibs = "2.0.4"
 navigation = "2.7.7"
 lifecycle = "2.8.3"
+navigationCompose = "2.7.0-alpha07"
+
+jetbrainsLiefcyle = "2.8.0"
 
 accompanist = "0.34.0"
 
-openaiClientBom = "3.8.1"
+openaiClient = "3.8.1"
 tts = "2.5.0"
 vosk = "0.3.47"
 
@@ -36,9 +38,13 @@ logging = "1.5.0"
 ksp = "2.0.0-1.0.22"
 compose-plugin = "1.6.11"
 
+#temp
+statelyCommon = "2.0.5"
+
 [libraries]
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin-compose-multiplatform" }
+koin-composeVm = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin-compose-multiplatform" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
 
@@ -48,12 +54,13 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotl
 kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
 kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
 
-ktor-client-apache = { module = "io.ktor:ktor-client-apache", version.ref = "ktorClientCore" }
+ktor-client-apache = { module = "io.ktor:ktor-client-apache5", version.ref = "ktorClientCore" }
+
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientCore" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktorClientCore" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
-stately-common = { module = "co.touchlab:stately-common", version.ref = "statelyCommon" }
+permissions-compose = { module = "dev.icerock.moko:permissions-compose", version.ref = "permissionsCompose" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
-voyager = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
 
 androidx-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "datastore-prefs" }
 androidx-datastore-prefs = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore-prefs" }
@@ -74,9 +81,10 @@ androidx-lifecycle-runtime-core = { module = "androidx.lifecycle:lifecycle-runti
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 
-ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp" }
-openai-client = { module = "com.aallam.openai:openai-client" }
-openai-client-bom = { module = "com.aallam.openai:openai-client-bom", version.ref = "openaiClientBom" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktorClientCore" }
+openai-client = { module = "com.aallam.openai:openai-client", version.ref = "openaiClient" }
+openai-client-bom = { module = "com.aallam.openai:openai-client-bom", version.ref = "openaiClient" }
+
 tts = { module = "nl.marc-apps:tts", version.ref = "tts" }
 tts-compose = { module = "nl.marc-apps:tts-compose", version.ref = "tts" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
@@ -85,6 +93,13 @@ android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs
 logging = { module = "org.lighthousegames:logging", version.ref = "logging" }
 
 voskAndroid = { module = "com.alphacephei:vosk-android", version.ref = "vosk" }
+
+jetbrains-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+jetbrains-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "jetbrainsLiefcyle" }
+jetbrains-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "jetbrainsLiefcyle" }
+
+#temp
+stately-common = { module = "co.touchlab:stately-common", version.ref = "statelyCommon" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

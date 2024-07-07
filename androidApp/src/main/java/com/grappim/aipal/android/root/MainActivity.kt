@@ -21,7 +21,7 @@ import com.grappim.aipal.android.feature.settings.SettingsRoute
 import com.grappim.aipal.android.feature.settings.ai.AiSettingsRoute
 import com.grappim.aipal.android.feature.settings.apiKeys.GptSettingsRoute
 import com.grappim.aipal.android.feature.stt.SttSettingsRoute
-import com.grappim.aipal.android.nav.NavDestinations
+import com.grappim.aipal.core.nav.NavDestinations
 import com.grappim.aipal.data.model.DarkThemeConfig
 import com.grappim.aipal.feature.main.MainState
 import com.grappim.aipal.uikit.AiPalTheme

@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.DialogProperties
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 const val PLATO_ALERT_DIALOG_TAG = "plato_alert_dialog_tag"

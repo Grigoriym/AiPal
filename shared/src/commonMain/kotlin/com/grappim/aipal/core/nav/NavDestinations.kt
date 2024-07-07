@@ -1,4 +1,4 @@
-package com.grappim.aipal.android.nav
+package com.grappim.aipal.core.nav
 
 sealed interface NavDestinations {
     val route: String

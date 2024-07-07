@@ -1,5 +1,6 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -9,58 +10,40 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.ksp)
 }
 
 kotlin {
     androidTarget {
-        tasks.withType<KotlinJvmCompile>().configureEach {
-            compilerOptions {
-                jvmTarget.set(JvmTarget.JVM_1_8)
-            }
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
         }
     }
 
-//    @OptIn(ExperimentalWasmDsl::class)
-//    wasmJs {
-//        moduleName = "shared"
-//        browser {
-//            commonWebpackConfig {
-//                outputFileName = "aipal.js"
-//            }
-//        }
-//        binaries.executable()
-//    }
-
-//    js {
-//        browser()
-//        binaries.executable()
-//    }
-
     jvm("desktop")
 
-//    listOf(
-//        iosX64(),
-//        iosArm64(),
-//        iosSimulatorArm64()
-//    ).forEach {
-//        it.binaries.framework {
-//            baseName = "shared"
-//            isStatic = true
-//        }
-//    }
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach {
+        it.binaries.framework {
+            baseName = "Shared"
+            isStatic = true
+        }
+    }
 
     sourceSets {
         commonMain.dependencies {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
+            implementation(libs.koin.composeVm)
 
             implementation(libs.kotlinx.serialization)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.datetime)
 
             implementation(libs.uuid)
-            implementation(libs.voyager)
             api(libs.logging)
 
             api(libs.androidx.datastore.preferences.core)
@@ -70,17 +53,18 @@ kotlin {
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.ui)
-            implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             implementation(compose.materialIconsExtended)
-            implementation(compose.preview)
 
-            implementation(project.dependencies.platform(libs.openai.client.bom))
+            implementation(libs.jetbrains.navigation.compose)
+            implementation(libs.jetbrains.lifecycle.viewmodel)
+            implementation(libs.jetbrains.lifecycle.runtimeCompose)
+
+//            implementation(project.dependencies.platform(libs.openai.client.bom))
             implementation(libs.openai.client)
-            runtimeOnly(libs.ktor.client.okhttp)
+//            runtimeOnly(libs.ktor.client.okhttp)
 
             implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.apache)
 
             implementation(libs.okio)
 
@@ -91,10 +75,17 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
+            api(libs.permissions.compose)
+        }
         androidMain.dependencies {
             implementation(libs.koin.android)
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
+
+            implementation(libs.ktor.client.okhttp)
+            api(libs.permissions.compose)
         }
         val desktopMain by getting
         desktopMain.dependencies {
@@ -110,8 +101,8 @@ android {
         minSdk = 24
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
 
         isCoreLibraryDesugaringEnabled = true
     }
@@ -131,5 +122,17 @@ android {
 
     dependencies {
         coreLibraryDesugaring(libs.android.desugarJdkLibs)
+    }
+}
+
+compose.desktop {
+    application {
+        mainClass = "MainKt"
+
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
+            packageName = "com.grappim.aipal"
+            packageVersion = "1.0.0"
+        }
     }
 }
