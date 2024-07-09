@@ -81,6 +81,7 @@ import com.grappim.aipal.feature.chat.ChatMessageUI
 import com.grappim.aipal.feature.chat.ChatState
 import com.grappim.aipal.widgets.PlatoAlertDialog
 import com.grappim.aipal.widgets.PlatoIconButton
+import com.grappim.aipal.widgets.PlatoSelectableText
 import com.grappim.aipal.widgets.PlatoTopBar
 import kotlinx.coroutines.launch
 import nl.marc_apps.tts.TextToSpeechEngine
@@ -184,7 +185,6 @@ fun ChatRoute(
                 Modifier
                     .fillMaxWidth(),
                 state = state,
-                viewModel = viewModel,
                 permissionState = permissionState
             )
         },
@@ -302,18 +302,18 @@ private fun ChatItem(
             Column(
                 modifier = Modifier.padding(16.dp),
             ) {
-                Text(text = message.message)
+                PlatoSelectableText(text = message.message)
                 if (message.spellingCheck.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(4.dp))
                     HorizontalDivider(color = Color.Green, thickness = 1.dp)
                     Spacer(modifier = Modifier.height(2.dp))
-                    Text(text = message.spellingCheck)
+                    PlatoSelectableText(text = message.spellingCheck)
                 }
                 if (message.translation.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(4.dp))
                     HorizontalDivider(color = Color.Blue, thickness = 1.dp)
                     Spacer(modifier = Modifier.height(2.dp))
-                    Text(text = message.translation)
+                    PlatoSelectableText(text = message.translation)
                 }
             }
         }
@@ -332,7 +332,6 @@ private fun ChatItem(
 private fun ChatBox(
     modifier: Modifier = Modifier,
     state: ChatState,
-    viewModel: ChatViewModel,
     permissionState: PermissionState
 ) {
     Row(
