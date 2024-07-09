@@ -316,6 +316,9 @@ private fun ChatItem(
                     PlatoSelectableText(text = message.translation)
                 }
                 if (message.isMessageDelivered.not()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    HorizontalDivider(color = Color.Red, thickness = 1.dp)
+                    Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = "This message was not delivered",
                         color = Color.Red

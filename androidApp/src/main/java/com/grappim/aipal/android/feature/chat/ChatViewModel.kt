@@ -206,14 +206,10 @@ class ChatViewModel(
             val result = aiPalRepo.sendMessage(msgToSend, messageId)
             result
                 .onFailure { e ->
-                    val resultUiMessage = requireNotNull(state.value.listMessages.find {
-                        it == uiMessage
-                    }).copy(
-                        isMessageDelivered = false
-                    )
                     val newList = state.value.listMessages.toMutableList()
-                    val index = newList.indexOf(resultUiMessage)
-                    newList[index] = resultUiMessage
+                    val index = newList.indexOfFirst { it.uuid == uiMessage.uuid }
+                    val resultUiMessage = newList[index]
+                    newList[index] = resultUiMessage.copy(isMessageDelivered = false)
 
                     _state.update {
                         it.copy(
