@@ -48,8 +48,9 @@ class ChatViewModel(
                 acknowledgeError = ::acknowledgeError,
                 onSpellCheck = ::checkSpelling,
                 onShowPermissionsAlertDialog = ::onShowPermissionsAlertDialog,
-                onSendMessage = ::sendMessage,
-                onTranslateMessage = ::translateMessage
+                onSendMessage = ::onSendMessage,
+                onTranslateMessage = ::translateMessage,
+                onMessageRefresh = ::onMessageRefresh
             ),
         )
     val state = _state.asStateFlow()
@@ -181,27 +182,34 @@ class ChatViewModel(
         }
     }
 
+    private fun onMessageRefresh(chatMessageUI: ChatMessageUI) {
+        trySendMessage(chatMessageUI)
+    }
+
     private fun editResultMessage(newMsg: String) {
         viewModelScope.launch {
             _state.update { it.copy(clientMessage = newMsg) }
         }
     }
 
-    private fun sendMessage() {
+    private fun trySendMessage(chatMessageUI: ChatMessageUI? = null) {
         viewModelScope.launch {
             turnOffSpeechService()
-            val messageId = uuidGenerator.getUuid4()
-            val msgToSend = state.value.clientMessage
-            val uiMessage = ChatMessageUI(
-                uuid = messageId,
-                message = msgToSend,
-                isUserMessage = true
-            )
-            _state.update {
-                it.copy(
-                    clientMessage = "",
-                    listMessages = it.listMessages + uiMessage,
+            val messageId = chatMessageUI?.uuid ?: uuidGenerator.getUuid4()
+            val msgToSend = chatMessageUI?.message ?: state.value.clientMessage
+            val uiMessage = chatMessageUI
+                ?: ChatMessageUI(
+                    uuid = messageId,
+                    message = msgToSend,
+                    isUserMessage = true
                 )
+            if (chatMessageUI == null) {
+                _state.update {
+                    it.copy(
+                        clientMessage = "",
+                        listMessages = it.listMessages + uiMessage,
+                    )
+                }
             }
             val result = aiPalRepo.sendMessage(msgToSend, messageId)
             result
@@ -229,14 +237,31 @@ class ChatViewModel(
                         message = resultMessage.text,
                         isUserMessage = false
                     )
-                    _state.update {
-                        it.copy(
-                            assistantMessage = resultMessage.text,
-                            listMessages = it.listMessages + resultUiMessage,
-                        )
+                    if (chatMessageUI != null) {
+                        val newList = state.value.listMessages.toMutableList()
+                        val index = newList.indexOfFirst { it.uuid == uiMessage.uuid }
+                        val oldMessage = newList[index]
+                        newList[index] = oldMessage.copy(isMessageDelivered = true)
+                        _state.update {
+                            it.copy(
+                                assistantMessage = resultMessage.text,
+                                listMessages = newList.toList() + resultUiMessage,
+                            )
+                        }
+                    } else {
+                        _state.update {
+                            it.copy(
+                                assistantMessage = resultMessage.text,
+                                listMessages = it.listMessages + resultUiMessage,
+                            )
+                        }
                     }
                 }
         }
+    }
+
+    private fun onSendMessage() {
+        trySendMessage()
     }
 
     private fun turnOffSpeechService() {

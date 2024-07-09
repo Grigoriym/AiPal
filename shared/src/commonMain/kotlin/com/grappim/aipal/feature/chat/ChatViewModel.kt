@@ -36,7 +36,8 @@ class ChatViewModel(
                 onSpellCheck = ::checkSpelling,
                 onShowPermissionsAlertDialog = ::onShowPermissionsAlertDialog,
                 onSendMessage = ::sendMessage,
-                onTranslateMessage = ::translateMessage
+                onTranslateMessage = ::translateMessage,
+                onMessageRefresh = ::onMessageRefresh
             ),
         )
     val state = _state.asStateFlow()
@@ -44,6 +45,10 @@ class ChatViewModel(
     private val logging = logging()
 
     init {
+
+    }
+
+    private fun onMessageRefresh(chatMessageUI: ChatMessageUI) {
 
     }
 
