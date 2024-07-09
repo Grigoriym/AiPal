@@ -12,6 +12,8 @@ import com.grappim.aipal.data.exceptions.OpenAiEmptyApiKeyException
 import com.grappim.aipal.data.local.LocalDataStorage
 import com.grappim.aipal.data.model.Message
 import com.grappim.aipal.data.model.MessageType
+import com.grappim.aipal.data.model.ResultMessage
+import com.grappim.aipal.data.uuid.UuidGenerator
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,6 +30,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class AiPalRepoImpl(
     private val localDataStorage: LocalDataStorage,
+    private val uuidGenerator: UuidGenerator
 ) : AiPalRepo {
 
     private val job = SupervisorJob()
@@ -64,8 +67,10 @@ class AiPalRepoImpl(
                     }
                     val messageToSend = "Let's talk in ${value.title}"
                     if (presentBehavior == null) {
+                        val lngId = uuidGenerator.getUuid4()
                         messages.add(
                             Message(
+                                id = lngId,
                                 text = messageToSend,
                                 role = Role.System,
                                 messageType = MessageType.LANGUAGE
@@ -84,8 +89,10 @@ class AiPalRepoImpl(
                                 it.messageType == MessageType.BEHAVIOR
                     }
                     if (presentBehavior == null) {
+                        val behaviorId = uuidGenerator.getUuid4()
                         messages.add(
                             Message(
+                                id = behaviorId,
                                 text = value,
                                 role = Role.System,
                                 messageType = MessageType.BEHAVIOR
@@ -104,8 +111,10 @@ class AiPalRepoImpl(
                                 it.messageType == MessageType.AI_FIX
                     }
                     if (presentBehavior == null) {
+                        val aiFixId = uuidGenerator.getUuid4()
                         messages.add(
                             Message(
+                                id = aiFixId,
                                 text = value,
                                 role = Role.System,
                                 messageType = MessageType.AI_FIX
@@ -196,11 +205,11 @@ class AiPalRepoImpl(
             }
         }
 
-    override suspend fun sendMessage(msg: String): Result<String> =
+    override suspend fun sendMessage(msg: String, msgId: String): Result<ResultMessage> =
         withContext(Dispatchers.IO) {
             try {
                 val service = getOpenAi() ?: throw OpenAiEmptyApiKeyException()
-                messages.add(Message(msg, Role.User))
+                messages.add(Message(msgId, msg, Role.User))
                 val chatCompletionRequest =
                     createChatCompletionRequest(
                         messages.map {
@@ -216,15 +225,34 @@ class AiPalRepoImpl(
                         .first()
                         .message
                 val result = receivedMessage.content ?: ""
-                messages.add(Message(result, Role.Assistant))
-                logging.d { result }
-                return@withContext Result.success(result)
+                val resultMessageId = uuidGenerator.getUuid4()
+                messages.add(
+                    Message(
+                        id = resultMessageId,
+                        text = result,
+                        role = Role.Assistant
+                    )
+                )
+                val resultMessage = ResultMessage(
+                    id = resultMessageId,
+                    text = result
+                )
+                logging.d { resultMessage }
+                return@withContext Result.success(resultMessage)
             } catch (e: CancellationException) {
+                removeMessageById(msgId)
                 throw e
             } catch (e: Exception) {
+                removeMessageById(msgId)
                 return@withContext Result.failure(e)
             }
         }
+
+    private suspend fun removeMessageById(id: String): Unit = withContext(Dispatchers.IO) {
+        messages.removeAll {
+            it.id == id
+        }
+    }
 
     private suspend fun createChatCompletionRequest(messages: List<ChatMessage>): ChatCompletionRequest =
         ChatCompletionRequest(

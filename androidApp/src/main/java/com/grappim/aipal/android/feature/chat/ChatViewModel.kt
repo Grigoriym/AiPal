@@ -13,6 +13,7 @@ import com.grappim.aipal.data.recognition.ModelRetrievalState
 import com.grappim.aipal.data.recognition.STTFactory
 import com.grappim.aipal.data.recognition.STTManager
 import com.grappim.aipal.data.repo.AiPalRepo
+import com.grappim.aipal.data.uuid.UuidGenerator
 import com.grappim.aipal.feature.chat.ChatMessageUI
 import com.grappim.aipal.feature.chat.ChatState
 import com.grappim.aipal.feature.chat.SnackbarData
@@ -30,6 +31,7 @@ class ChatViewModel(
     private val aiPalRepo: AiPalRepo,
     private val localDataStorage: LocalDataStorage,
     private val sttFactory: STTFactory,
+    private val uuidGenerator: UuidGenerator
 ) : ViewModel() {
     private var sttManager: STTManager
 
@@ -188,19 +190,34 @@ class ChatViewModel(
     private fun sendMessage() {
         viewModelScope.launch {
             turnOffSpeechService()
+            val messageId = uuidGenerator.getUuid4()
             val msgToSend = state.value.clientMessage
-            val uiMessage = ChatMessageUI(message = msgToSend, isUserMessage = true)
+            val uiMessage = ChatMessageUI(
+                uuid = messageId,
+                message = msgToSend,
+                isUserMessage = true
+            )
             _state.update {
                 it.copy(
                     clientMessage = "",
                     listMessages = it.listMessages + uiMessage,
                 )
             }
-            val result = aiPalRepo.sendMessage(msgToSend)
+            val result = aiPalRepo.sendMessage(msgToSend, messageId)
             result
                 .onFailure { e ->
+                    val resultUiMessage = requireNotNull(state.value.listMessages.find {
+                        it == uiMessage
+                    }).copy(
+                        isMessageDelivered = false
+                    )
+                    val newList = state.value.listMessages.toMutableList()
+                    val index = newList.indexOf(resultUiMessage)
+                    newList[index] = resultUiMessage
+
                     _state.update {
                         it.copy(
+                            listMessages = newList.toList(),
                             snackbarMessage =
                             LaunchedEffectResult(
                                 SnackbarData(
@@ -210,11 +227,15 @@ class ChatViewModel(
                             ),
                         )
                     }
-                }.onSuccess { value ->
-                    val resultUiMessage = ChatMessageUI(message = value, isUserMessage = false)
+                }.onSuccess { resultMessage ->
+                    val resultUiMessage = ChatMessageUI(
+                        uuid = resultMessage.id,
+                        message = resultMessage.text,
+                        isUserMessage = false
+                    )
                     _state.update {
                         it.copy(
-                            assistantMessage = value,
+                            assistantMessage = resultMessage.text,
                             listMessages = it.listMessages + resultUiMessage,
                         )
                     }
