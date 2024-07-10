@@ -39,6 +39,7 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Spellcheck
 import androidx.compose.material.icons.filled.Translate
@@ -235,7 +236,8 @@ fun ChatRoute(
                     onTranslate = state.onTranslateMessage,
                     onSpellCheck = { chatMessage ->
                         state.onSpellCheck(chatMessage)
-                    }
+                    },
+                    state = state
                 )
             }
         }
@@ -269,6 +271,7 @@ private fun ChatItem(
     onMessageCopy: (String) -> Unit,
     onTranslate: (ChatMessageUI) -> Unit,
     onSpellCheck: (ChatMessageUI) -> Unit,
+    state: ChatState
 ) {
     Row(
         modifier =
@@ -315,14 +318,31 @@ private fun ChatItem(
                     Spacer(modifier = Modifier.height(2.dp))
                     PlatoSelectableText(text = message.translation)
                 }
+                if (message.isMessageDelivered.not()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    HorizontalDivider(color = Color.Red, thickness = 1.dp)
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "This message was not delivered",
+                        color = Color.Red
+                    )
+                }
             }
         }
         if (message.isUserMessage) {
-            IconButton(onClick = { onMessageCopy(message.message) }) {
-                Icon(imageVector = Icons.Filled.ContentCopy, contentDescription = "")
-            }
-            IconButton(onClick = { onSpellCheck(message) }) {
-                Icon(imageVector = Icons.Filled.Spellcheck, contentDescription = "")
+            PlatoIconButton(
+                icon = Icons.Filled.ContentCopy,
+                onButtonClick = { onMessageCopy(message.message) })
+            PlatoIconButton(
+                icon = Icons.Filled.Spellcheck,
+                onButtonClick = { onSpellCheck(message) })
+            if (!message.isMessageDelivered) {
+                PlatoIconButton(
+                    tint = Color.Red,
+                    icon = Icons.Filled.Refresh,
+                    onButtonClick = {
+                        state.onMessageRefresh(message)
+                    })
             }
         }
     }

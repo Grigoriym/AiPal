@@ -6,6 +6,8 @@ import com.grappim.aipal.data.local.LocalDataStorage
 import com.grappim.aipal.data.local.LocalDataStorageImpl
 import com.grappim.aipal.data.repo.AiPalRepo
 import com.grappim.aipal.data.repo.AiPalRepoImpl
+import com.grappim.aipal.data.uuid.UuidGenerator
+import com.grappim.aipal.data.uuid.UuidGeneratorImpl
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
@@ -14,22 +16,29 @@ val appModule = module {
     includes(commonModule())
 }
 
-@OptIn(ExperimentalSerializationApi::class)
 fun commonModule() = module {
-    single {
-        Json {
-            isLenient = true
-            prettyPrint = false
-            ignoreUnknownKeys = true
-            explicitNulls = false
-        }
-    }
+    single { provideJson() }
+
+    single<UuidGenerator> { UuidGeneratorImpl() }
 }
 
 fun repoModule() = module {
-    single<AiPalRepo> { AiPalRepoImpl(get<LocalDataStorage>()) }
+    single<AiPalRepo> {
+        AiPalRepoImpl(
+            localDataStorage = get<LocalDataStorage>(),
+            uuidGenerator = get<UuidGenerator>()
+        )
+    }
 }
 
 fun mobileLocalDataStorageModule() = module {
     single<LocalDataStorage> { LocalDataStorageImpl(get<DataStore<Preferences>>()) }
+}
+
+@OptIn(ExperimentalSerializationApi::class)
+private fun provideJson() = Json {
+    isLenient = true
+    prettyPrint = false
+    ignoreUnknownKeys = true
+    explicitNulls = false
 }

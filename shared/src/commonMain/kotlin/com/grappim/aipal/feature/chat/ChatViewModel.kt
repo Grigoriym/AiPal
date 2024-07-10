@@ -7,6 +7,7 @@ import com.grappim.aipal.data.exceptions.OpenAiEmptyApiKeyException
 import com.grappim.aipal.data.local.LocalDataStorage
 import com.grappim.aipal.data.recognition.STTManager
 import com.grappim.aipal.data.repo.AiPalRepo
+import com.grappim.aipal.data.uuid.UuidGenerator
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,6 +18,7 @@ import org.lighthousegames.logging.logging
 class ChatViewModel(
     private val aiPalRepo: AiPalRepo,
     private val localDataStorage: LocalDataStorage,
+    private val uuidGenerator: UuidGenerator
 ) : ViewModel() {
     private lateinit var sttManager: STTManager
 
@@ -34,7 +36,8 @@ class ChatViewModel(
                 onSpellCheck = ::checkSpelling,
                 onShowPermissionsAlertDialog = ::onShowPermissionsAlertDialog,
                 onSendMessage = ::sendMessage,
-                onTranslateMessage = ::translateMessage
+                onTranslateMessage = ::translateMessage,
+                onMessageRefresh = ::onMessageRefresh
             ),
         )
     val state = _state.asStateFlow()
@@ -42,6 +45,10 @@ class ChatViewModel(
     private val logging = logging()
 
     init {
+
+    }
+
+    private fun onMessageRefresh(chatMessageUI: ChatMessageUI) {
 
     }
 
@@ -123,15 +130,17 @@ class ChatViewModel(
     private fun sendMessage() {
         viewModelScope.launch {
             turnOffSpeechService()
+            val messageId = uuidGenerator.getUuid4()
             val msgToSend = state.value.clientMessage
-            val uiMessage = ChatMessageUI(message = msgToSend, isUserMessage = true)
+            val uiMessage =
+                ChatMessageUI(uuid = messageId, message = msgToSend, isUserMessage = true)
             _state.update {
                 it.copy(
                     clientMessage = "",
                     listMessages = it.listMessages + uiMessage,
                 )
             }
-            val result = aiPalRepo.sendMessage(msgToSend)
+            val result = aiPalRepo.sendMessage(msgToSend, messageId)
             result
                 .onFailure { e ->
                     _state.update {
@@ -145,11 +154,15 @@ class ChatViewModel(
                             ),
                         )
                     }
-                }.onSuccess { value ->
-                    val resultUiMessage = ChatMessageUI(message = value, isUserMessage = false)
+                }.onSuccess { resultMessage ->
+                    val resultUiMessage = ChatMessageUI(
+                        uuid = resultMessage.id,
+                        message = resultMessage.text,
+                        isUserMessage = false
+                    )
                     _state.update {
                         it.copy(
-                            assistantMessage = value,
+                            assistantMessage = resultMessage.text,
                             listMessages = it.listMessages + resultUiMessage,
                         )
                     }
