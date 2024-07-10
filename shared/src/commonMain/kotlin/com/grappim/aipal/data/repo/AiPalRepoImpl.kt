@@ -1,5 +1,6 @@
 package com.grappim.aipal.data.repo
 
+import com.aallam.openai.api.chat.ChatCompletion
 import com.aallam.openai.api.chat.ChatCompletionRequest
 import com.aallam.openai.api.chat.ChatMessage
 import com.aallam.openai.api.core.Role
@@ -17,7 +18,6 @@ import com.grappim.aipal.data.uuid.UuidGenerator
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -36,7 +36,7 @@ class AiPalRepoImpl(
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.Default + job)
 
-    private val messages = mutableListOf<Message>()
+    private val messages: ThreadSafeMessageList = ThreadSafeMessageList()
 
     private val logging = logging()
 
@@ -61,110 +61,91 @@ class AiPalRepoImpl(
         scope.launch {
             launch {
                 localDataStorage.currentLanguage.collect { value ->
-                    val presentBehavior = messages.find {
-                        it.role == Role.System &&
-                                it.messageType == MessageType.LANGUAGE
-                    }
-                    val messageToSend = "Let's talk in ${value.title}"
-                    if (presentBehavior == null) {
-                        val lngId = uuidGenerator.getUuid4()
-                        messages.add(
-                            Message(
-                                id = lngId,
-                                text = messageToSend,
-                                role = Role.System,
-                                messageType = MessageType.LANGUAGE
-                            )
-                        )
-                    } else {
-                        val newBehavior = presentBehavior.copy(text = messageToSend)
-                        messages[messages.indexOf(presentBehavior)] = newBehavior
-                    }
+                    updateOrAddSystemMessage(
+                        messageType = MessageType.LANGUAGE,
+                        newText = "Let's talk in ${value.title}"
+                    )
                 }
             }
             launch {
                 localDataStorage.behavior.collect { value ->
-                    val presentBehavior = messages.find {
-                        it.role == Role.System &&
-                                it.messageType == MessageType.BEHAVIOR
-                    }
-                    if (presentBehavior == null) {
-                        val behaviorId = uuidGenerator.getUuid4()
-                        messages.add(
-                            Message(
-                                id = behaviorId,
-                                text = value,
-                                role = Role.System,
-                                messageType = MessageType.BEHAVIOR
-                            )
-                        )
-                    } else {
-                        val newBehavior = presentBehavior.copy(text = value)
-                        messages[messages.indexOf(presentBehavior)] = newBehavior
-                    }
+                    updateOrAddSystemMessage(
+                        messageType = MessageType.BEHAVIOR,
+                        newText = value
+                    )
                 }
             }
             launch {
                 localDataStorage.aiAnswerFixPrompt.collect { value ->
-                    val presentBehavior = messages.find {
-                        it.role == Role.System &&
-                                it.messageType == MessageType.AI_FIX
-                    }
-                    if (presentBehavior == null) {
-                        val aiFixId = uuidGenerator.getUuid4()
-                        messages.add(
-                            Message(
-                                id = aiFixId,
-                                text = value,
-                                role = Role.System,
-                                messageType = MessageType.AI_FIX
-                            )
-                        )
-                    } else {
-                        val newBehavior = presentBehavior.copy(text = value)
-                        messages[messages.indexOf(presentBehavior)] = newBehavior
-                    }
+                    updateOrAddSystemMessage(
+                        messageType = MessageType.AI_FIX,
+                        newText = value
+                    )
                 }
             }
         }
     }
 
-    private suspend fun getOpenAi(): OpenAI? = openAiFlow.firstOrNull()
+    private suspend fun updateOrAddSystemMessage(messageType: MessageType, newText: String) {
+        val currentMessages = messages.getMessages()
+        val existingMessage = currentMessages.find {
+            it.role == Role.System && it.messageType == messageType
+        }
 
-    override suspend fun checkSpelling(msg: String): Result<String> = withContext(Dispatchers.IO) {
-        try {
-            val service = getOpenAi() ?: throw OpenAiEmptyApiKeyException()
-            val chatCompletionRequest =
-                createChatCompletionRequest(
-                    listOf(
-                        ChatMessage(
-                            role = Role.System,
-                            content = localDataStorage.spellingPrompt.first(),
-                        ),
-                        ChatMessage(
-                            role = Role.User,
-                            content = msg,
-                        ),
-                    ),
+        if (existingMessage == null) {
+            val newId = uuidGenerator.getUuid4()
+            messages.addMessage(
+                Message(
+                    id = newId,
+                    text = newText,
+                    role = Role.System,
+                    messageType = messageType
                 )
-            val completion = service.chatCompletion(chatCompletionRequest)
-            val receivedMessage =
-                completion.choices
-                    .first()
-                    .message
-            Result.success(receivedMessage.content ?: "")
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            logging.e { e }
-            Result.failure(e)
+            )
+        } else {
+            messages.removeMessageById(existingMessage.id)
+            messages.addMessage(existingMessage.copy(text = newText))
         }
     }
 
-    override suspend fun translateMessage(msg: String): Result<String> =
-        withContext(Dispatchers.IO) {
+    private suspend fun getOpenAi(): OpenAI =
+        openAiFlow.firstOrNull() ?: throw OpenAiEmptyApiKeyException()
+
+    override suspend fun checkSpelling(msg: String): Result<String> =
+        withContext(Dispatchers.Default) {
             try {
-                val service = getOpenAi() ?: throw OpenAiEmptyApiKeyException()
+                val service = getOpenAi()
+                val chatCompletionRequest =
+                    createChatCompletionRequest(
+                        listOf(
+                            ChatMessage(
+                                role = Role.System,
+                                content = localDataStorage.spellingPrompt.first(),
+                            ),
+                            ChatMessage(
+                                role = Role.User,
+                                content = msg,
+                            ),
+                        ),
+                    )
+                val completion = service.chatCompletion(chatCompletionRequest)
+                val receivedMessage =
+                    completion.choices
+                        .first()
+                        .message
+                Result.success(receivedMessage.content ?: "")
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                logging.e { e }
+                Result.failure(e)
+            }
+        }
+
+    override suspend fun translateMessage(msg: String): Result<String> =
+        withContext(Dispatchers.Default) {
+            try {
+                val service = getOpenAi()
                 val chatCompletionRequest =
                     createChatCompletionRequest(
                         listOf(
@@ -193,9 +174,9 @@ class AiPalRepoImpl(
         }
 
     override suspend fun getModels(): Result<List<String>> =
-        withContext(Dispatchers.IO) {
+        withContext(Dispatchers.Default) {
             try {
-                val service = getOpenAi() ?: throw OpenAiEmptyApiKeyException()
+                val service = getOpenAi()
                 Result.success(service.models().map { it.id.id })
             } catch (e: CancellationException) {
                 throw e
@@ -206,13 +187,13 @@ class AiPalRepoImpl(
         }
 
     override suspend fun sendMessage(msg: String, msgId: String): Result<ResultMessage> =
-        withContext(Dispatchers.IO) {
+        withContext(Dispatchers.Default) {
             try {
-                val service = getOpenAi() ?: throw OpenAiEmptyApiKeyException()
-                messages.add(Message(msgId, msg, Role.User))
+                val service = getOpenAi()
+                messages.addMessage(Message(msgId, msg, Role.User))
                 val chatCompletionRequest =
                     createChatCompletionRequest(
-                        messages.map {
+                        messages.getMessages().map {
                             ChatMessage(
                                 role = it.role,
                                 content = it.text,
@@ -220,13 +201,9 @@ class AiPalRepoImpl(
                         },
                     )
                 val completion = service.chatCompletion(chatCompletionRequest)
-                val receivedMessage =
-                    completion.choices
-                        .first()
-                        .message
-                val result = receivedMessage.content ?: ""
+                val result = processCompletion(completion)
                 val resultMessageId = uuidGenerator.getUuid4()
-                messages.add(
+                messages.addMessage(
                     Message(
                         id = resultMessageId,
                         text = result,
@@ -238,20 +215,24 @@ class AiPalRepoImpl(
                     text = result
                 )
                 logging.d { resultMessage }
-                return@withContext Result.success(resultMessage)
+                Result.success(resultMessage)
             } catch (e: CancellationException) {
                 removeMessageById(msgId)
                 throw e
             } catch (e: Exception) {
+                logging.e { e }
                 removeMessageById(msgId)
-                return@withContext Result.failure(e)
+                Result.failure(e)
             }
         }
 
-    private suspend fun removeMessageById(id: String): Unit = withContext(Dispatchers.IO) {
-        messages.removeAll {
-            it.id == id
-        }
+    private fun processCompletion(completion: ChatCompletion): String {
+        return completion.choices.firstOrNull()?.message?.content
+            ?: error("Empty response message content")
+    }
+
+    private suspend fun removeMessageById(id: String) {
+        messages.removeMessageById(id)
     }
 
     private suspend fun createChatCompletionRequest(messages: List<ChatMessage>): ChatCompletionRequest =
