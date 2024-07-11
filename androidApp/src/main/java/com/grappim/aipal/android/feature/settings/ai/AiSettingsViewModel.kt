@@ -2,6 +2,7 @@ package com.grappim.aipal.android.feature.settings.ai
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.grappim.aipal.core.LaunchedEffectResult
 import com.grappim.aipal.data.local.LocalDataStorage
 import com.grappim.aipal.data.repo.AiPalRepo
 import com.grappim.aipal.feature.settings.ai.AiSettingsState
@@ -19,12 +20,14 @@ class AiSettingsViewModel(
         MutableStateFlow(
             AiSettingsState(
                 onSetTempValue = ::setTemp,
-                applySettings = ::applyChanges,
+                applyTemp = ::applyTemp,
                 onGetModels = ::getModels,
                 onSetModel = ::setModel,
             ),
         )
     val state = _state.asStateFlow()
+
+    private val logging = logging()
 
     init {
         viewModelScope.launch {
@@ -47,12 +50,12 @@ class AiSettingsViewModel(
     }
 
     private fun setTemp(newTemp: Double) {
-        logging().d { "newTemp: $newTemp" }
+        logging.d { "newTemp: $newTemp" }
         val formattedTemp = "%.1f".format(newTemp)
         _state.update { it.copy(tempValue = formattedTemp.toDouble()) }
     }
 
-    private fun applyChanges() {
+    private fun applyTemp() {
         viewModelScope.launch {
             localDataStorage.setTemperature(state.value.tempValue)
         }
@@ -60,9 +63,26 @@ class AiSettingsViewModel(
 
     private fun getModels() {
         viewModelScope.launch {
-            val models = aiPalRepo.getModels().getOrDefault(emptyList())
-            logging().d { models.joinToString() }
-            localDataStorage.setGptModels(models)
+            aiPalRepo.getModels()
+                .onSuccess { models ->
+                    _state.update {
+                        it.copy(
+                            snackbarMessage = LaunchedEffectResult(
+                                "Models were downloaded"
+                            )
+                        )
+                    }
+                    localDataStorage.setGptModels(models)
+                }
+                .onFailure { exception ->
+                    _state.update {
+                        it.copy(
+                            snackbarMessage = LaunchedEffectResult(
+                                exception.message ?: ""
+                            )
+                        )
+                    }
+                }
         }
     }
 
