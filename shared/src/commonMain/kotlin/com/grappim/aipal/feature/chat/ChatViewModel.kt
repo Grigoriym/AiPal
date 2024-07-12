@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.grappim.aipal.core.LaunchedEffectResult
 import com.grappim.aipal.data.exceptions.OpenAiEmptyApiKeyException
 import com.grappim.aipal.data.local.LocalDataStorage
+import com.grappim.aipal.data.recognition.STTFactory
 import com.grappim.aipal.data.recognition.STTManager
 import com.grappim.aipal.data.repo.AiPalRepo
 import com.grappim.aipal.data.uuid.UuidGenerator
@@ -18,7 +19,8 @@ import org.lighthousegames.logging.logging
 class ChatViewModel(
     private val aiPalRepo: AiPalRepo,
     private val localDataStorage: LocalDataStorage,
-    private val uuidGenerator: UuidGenerator
+    private val uuidGenerator: UuidGenerator,
+    private val sttFactory: STTFactory
 ) : ViewModel() {
     private lateinit var sttManager: STTManager
 

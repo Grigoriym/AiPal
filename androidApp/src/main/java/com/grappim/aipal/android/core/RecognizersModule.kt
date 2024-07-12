@@ -26,8 +26,8 @@ val recognizersModule =
 
         factory<RecognitionMessageDecoder> { RecognitionMessageDecoderImpl(get<Json>()) }
 
-        factory { AndroidSSTManager(get<SpeechRecognitionWrapper>(), get<LocalDataStorage>()) }
-        factory {
+        single { AndroidSSTManager(get<SpeechRecognitionWrapper>(), get<LocalDataStorage>()) }
+        single {
             VoskSttManager(
                 get<RecognitionMessageDecoder>(),
                 get<LocalDataStorage>(),
@@ -39,12 +39,8 @@ val recognizersModule =
 
         single<STTFactory> {
             AndroidSTTFactory(
-                androidSSTManagerFactory = {
-                    get<AndroidSSTManager>()
-                },
-                voskSttManagerFactory = {
-                    get<VoskSttManager>()
-                }
+                get<AndroidSSTManager>(),
+                get<VoskSttManager>()
             )
         }
     }

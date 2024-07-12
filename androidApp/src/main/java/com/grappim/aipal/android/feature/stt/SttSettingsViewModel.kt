@@ -78,12 +78,12 @@ class SttSettingsViewModel(
             _state.update {
                 it.copy(isDownloading = true)
             }
-            if (sttManager is Downloadable) {
-                sttManager.runAs<Downloadable> {
-                    downloadModelFile(voskModelAvailability.supportedLanguage)
-                    checkAvailableModels()
-                }
+
+            sttManager.runAs<Downloadable> {
+                downloadModelFile(voskModelAvailability.supportedLanguage)
+                checkAvailableModels()
             }
+
             _state.update {
                 it.copy(isDownloading = false)
             }
@@ -95,14 +95,12 @@ class SttSettingsViewModel(
     }
 
     private suspend fun checkAvailableModels() {
-        if (sttManager is ModelAvailabilityRetrieval) {
-            sttManager.runAs<ModelAvailabilityRetrieval> {
-                val ui = whichModelsAvailable().map { model ->
-                    VoskModelUI(voskModelAvailability = model)
-                }
-                _state.update {
-                    it.copy(availableModels = ui)
-                }
+        sttManager.runAs<ModelAvailabilityRetrieval> {
+            val ui = whichModelsAvailable().map { model ->
+                VoskModelUI(voskModelAvailability = model)
+            }
+            _state.update {
+                it.copy(availableModels = ui)
             }
         }
     }
