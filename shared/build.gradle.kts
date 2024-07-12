@@ -60,9 +60,7 @@ kotlin {
             implementation(libs.jetbrains.lifecycle.viewmodel)
             implementation(libs.jetbrains.lifecycle.runtimeCompose)
 
-//            implementation(project.dependencies.platform(libs.openai.client.bom))
             implementation(libs.openai.client)
-//            runtimeOnly(libs.ktor.client.okhttp)
 
             implementation(libs.ktor.client.core)
 
@@ -72,13 +70,16 @@ kotlin {
             // https://github.com/cashapp/sqldelight/issues/4357#issuecomment-1839905700
             implementation(libs.stately.common)
         }
+
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
+
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
             api(libs.permissions.compose)
         }
+
         androidMain.dependencies {
             implementation(libs.koin.android)
             implementation(libs.compose.ui.tooling.preview)
@@ -87,18 +88,20 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             api(libs.permissions.compose)
         }
+
         val desktopMain by getting
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
+            implementation(libs.kotlinx.coroutines.swing)
         }
     }
 }
 
 android {
     namespace = "com.grappim.aipal"
-    compileSdk = 34
+    compileSdk = libs.versions.compileSdk.get().toInt()
     defaultConfig {
-        minSdk = 24
+        minSdk = libs.versions.minSdk.get().toInt()
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
