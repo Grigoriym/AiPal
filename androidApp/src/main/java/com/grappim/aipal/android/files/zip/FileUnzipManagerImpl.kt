@@ -69,8 +69,9 @@ class FileUnzipManagerImpl : FileUnzipManager {
                             processedSize += entry.compressedSize
                             val percentage =
                                 if (totalSize > 0) (processedSize * 100 / totalSize) else 0
-                            logging.d { "unzipping :${percentage.coerceAtMost(100)}" }
-                            progressCallback(percentage.coerceAtMost(100).toInt())
+                            val result = percentage.coerceAtMost(100).toInt()
+                            logging.d { "unzipping :${result}" }
+                            progressCallback(result)
                         } else {
                             // If the entry is a directory, make the directory
                             val dir = File(filePath)

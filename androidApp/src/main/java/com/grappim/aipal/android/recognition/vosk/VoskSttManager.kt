@@ -42,7 +42,7 @@ class VoskSttManager(
     ModelAvailabilityRetrieval {
 
     private val job = SupervisorJob()
-    private val scope = CoroutineScope(Dispatchers.IO + job)
+    private val scope = CoroutineScope(Dispatchers.Default + job)
     private var runningJob: Job? = null
 
     private val logging = logging()

@@ -1,6 +1,6 @@
 package com.grappim.aipal.android.recognition.factory
 
-import com.grappim.aipal.android.recognition.android.AndroidSSTManager
+import com.grappim.aipal.android.recognition.android.AndroidSttManager
 import com.grappim.aipal.android.recognition.vosk.VoskSttManager
 import com.grappim.aipal.data.recognition.CurrentSTTManager
 import com.grappim.aipal.data.recognition.STTFactory
@@ -8,38 +8,25 @@ import com.grappim.aipal.data.recognition.STTManager
 import org.lighthousegames.logging.logging
 
 class AndroidSTTFactory(
-    private val androidSSTManagerFactory: AndroidSSTManager,
-    private val voskSttManagerFactory: VoskSttManager
+    private val androidSttManager: AndroidSttManager,
+    private val voskSttManager: VoskSttManager
 ) : STTFactory {
 
-    private var androidManager: AndroidSSTManager? = null
-    private var voskManager: VoskSttManager? = null
+    private val logging = logging()
+
+    private var current: STTManager? = null
 
     override fun getSSTManager(currentSTTManager: CurrentSTTManager): STTManager {
-        logging().d { "Now you have chosen: $currentSTTManager" }
-        val manager = when (currentSTTManager) {
-            CurrentSTTManager.Android -> getAndroidManager()
-            CurrentSTTManager.Vosk -> getVoskManager()
-        }
-        logging().d { "Now you are using: $manager" }
-        return manager
-    }
+        logging.d { "Now you have chosen: $currentSTTManager" }
 
-    private fun getAndroidManager(): AndroidSSTManager {
-        voskManager?.cleanup()
-        if (androidManager == null) {
-            androidManager = androidSSTManagerFactory
+        current?.cleanup()
+        val current = when (currentSTTManager) {
+            CurrentSTTManager.Android -> androidSttManager
+            CurrentSTTManager.Vosk -> voskSttManager
         }
-        androidManager?.initialize()
-        return androidManager!!
-    }
+        current.initialize()
 
-    private fun getVoskManager(): VoskSttManager {
-        androidManager?.cleanup()
-        if (voskManager == null) {
-            voskManager = voskSttManagerFactory
-        }
-        voskManager?.initialize()
-        return voskManager!!
+        logging.d { "Now you are using: $current" }
+        return current
     }
 }

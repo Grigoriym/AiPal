@@ -20,8 +20,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 import org.lighthousegames.logging.logging
 
-class AndroidSSTManager(
-    private val speechRecognitionWrapper: SpeechRecognitionWrapper,
+class AndroidSttManager(
+    private val androidSpeechRecognizerWrapper: AndroidSpeechRecognizerWrapper,
     private val localDataStorage: LocalDataStorage,
 ) : STTManager,
     RecognitionListener {
@@ -36,7 +36,7 @@ class AndroidSSTManager(
     override suspend fun startListening() = withContext(Dispatchers.Main) {
         setDefaultState()
 
-        if (!speechRecognitionWrapper.isRecognitionAvailable()) {
+        if (!androidSpeechRecognizerWrapper.isRecognitionAvailable()) {
             _state.update { it.copy(error = "Recognition is not available") }
             return@withContext
         }
@@ -52,13 +52,13 @@ class AndroidSSTManager(
                 )
                 putExtra(RecognizerIntent.EXTRA_LANGUAGE, languageCode)
             }
-        speechRecognitionWrapper.setRecognitionListener(this@AndroidSSTManager)
-        speechRecognitionWrapper.startListening(intent)
+        androidSpeechRecognizerWrapper.setRecognitionListener(this@AndroidSttManager)
+        androidSpeechRecognizerWrapper.startListening(intent)
         _state.update { it.copy(isSpeaking = true) }
     }
 
     override suspend fun changeLanguage(supportedLanguage: SupportedLanguage) {
-        speechRecognitionWrapper.cancel()
+        androidSpeechRecognizerWrapper.cancel()
     }
 
     override fun resetToDefaultState() {
@@ -69,16 +69,16 @@ class AndroidSSTManager(
 
     override fun stopListening() {
         setDefaultState()
-        speechRecognitionWrapper.stopListening()
+        androidSpeechRecognizerWrapper.stopListening()
     }
 
     private fun setDefaultState() {
         _state.update { RecognitionState() }
-        speechRecognitionWrapper.stopListening()
+        androidSpeechRecognizerWrapper.stopListening()
     }
 
     override fun cleanup() {
-        speechRecognitionWrapper.cancel()
+        androidSpeechRecognizerWrapper.cancel()
     }
 
     override fun onReadyForSpeech(params: Bundle?) {
