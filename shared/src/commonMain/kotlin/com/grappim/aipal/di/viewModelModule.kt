@@ -1,6 +1,7 @@
 package com.grappim.aipal.di
 
 import com.grappim.aipal.data.local.LocalDataStorage
+import com.grappim.aipal.data.recognition.STTFactory
 import com.grappim.aipal.data.repo.AiPalRepo
 import com.grappim.aipal.data.uuid.UuidGenerator
 import com.grappim.aipal.feature.chat.ChatViewModel
@@ -12,7 +13,8 @@ fun viewModelModule() = module {
         ChatViewModel(
             aiPalRepo = get<AiPalRepo>(),
             localDataStorage = get<LocalDataStorage>(),
-            uuidGenerator = get<UuidGenerator>()
+            uuidGenerator = get<UuidGenerator>(),
+            sttFactory = get<STTFactory>()
         )
     }
 }

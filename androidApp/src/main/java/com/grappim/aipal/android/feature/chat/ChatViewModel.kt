@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.lighthousegames.logging.logging
 
 class ChatViewModel(
@@ -33,7 +32,7 @@ class ChatViewModel(
     private val sttFactory: STTFactory,
     private val uuidGenerator: UuidGenerator
 ) : ViewModel() {
-    private var sttManager: STTManager
+    private lateinit var sttManager: STTManager
 
     private var runningJob: Job? = null
 
@@ -58,8 +57,8 @@ class ChatViewModel(
     private val logging = logging()
 
     init {
-        sttManager = runBlocking { sttFactory.getSSTManager(localDataStorage.sttManager.first()) }
         viewModelScope.launch {
+            sttManager = sttFactory.getSSTManager(localDataStorage.sttManager.first())
             launch {
                 localDataStorage.sttManager
                     .distinctUntilChanged()

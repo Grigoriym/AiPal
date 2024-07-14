@@ -9,8 +9,8 @@ import com.grappim.aipal.core.LaunchedEffectResult
 import com.grappim.aipal.core.SupportedLanguage
 import com.grappim.aipal.data.local.LocalDataStorage
 import com.grappim.aipal.data.recognition.CurrentSTTManager
-import com.grappim.aipal.data.recognition.STTManager
 import com.grappim.aipal.data.recognition.STTFactory
+import com.grappim.aipal.data.recognition.STTManager
 import com.grappim.aipal.feature.chat.SnackbarData
 import com.grappim.aipal.utils.runAs
 import kotlinx.coroutines.Job
@@ -20,14 +20,13 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.lighthousegames.logging.logging
 
 class SttSettingsViewModel(
     private val localDataStorage: LocalDataStorage,
     private val sttFactory: STTFactory,
 ) : ViewModel() {
-    private var sttManager: STTManager
+    private lateinit var sttManager: STTManager
 
     private var runningJob: Job? = null
 
@@ -50,8 +49,8 @@ class SttSettingsViewModel(
     val state = _state.asStateFlow()
 
     init {
-        sttManager = runBlocking { sttFactory.getSSTManager(localDataStorage.sttManager.first()) }
         viewModelScope.launch {
+            sttManager = sttFactory.getSSTManager(localDataStorage.sttManager.first())
             launch {
                 localDataStorage.sttManager.distinctUntilChanged().collect { newStt ->
                     _state.update { it.copy(currentSTTManager = newStt) }
@@ -78,12 +77,12 @@ class SttSettingsViewModel(
             _state.update {
                 it.copy(isDownloading = true)
             }
-            if (sttManager is Downloadable) {
-                sttManager.runAs<Downloadable> {
-                    downloadModelFile(voskModelAvailability.supportedLanguage)
-                    checkAvailableModels()
-                }
+
+            sttManager.runAs<Downloadable> {
+                downloadModelFile(voskModelAvailability.supportedLanguage)
+                checkAvailableModels()
             }
+
             _state.update {
                 it.copy(isDownloading = false)
             }
@@ -95,14 +94,12 @@ class SttSettingsViewModel(
     }
 
     private suspend fun checkAvailableModels() {
-        if (sttManager is ModelAvailabilityRetrieval) {
-            sttManager.runAs<ModelAvailabilityRetrieval> {
-                val ui = whichModelsAvailable().map { model ->
-                    VoskModelUI(voskModelAvailability = model)
-                }
-                _state.update {
-                    it.copy(availableModels = ui)
-                }
+        sttManager.runAs<ModelAvailabilityRetrieval> {
+            val ui = whichModelsAvailable().map { model ->
+                VoskModelUI(voskModelAvailability = model)
+            }
+            _state.update {
+                it.copy(availableModels = ui)
             }
         }
     }

@@ -5,7 +5,7 @@ import android.speech.RecognitionListener
 import android.speech.SpeechRecognizer
 import androidx.annotation.MainThread
 
-interface SpeechRecognitionWrapper {
+interface AndroidSpeechRecognizerWrapper {
     val speechRecognizer: SpeechRecognizer
 
     fun isRecognitionAvailable(): Boolean

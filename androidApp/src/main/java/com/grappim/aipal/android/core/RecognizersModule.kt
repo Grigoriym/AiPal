@@ -4,9 +4,9 @@ import android.content.Context
 import com.grappim.aipal.android.files.path.FolderPathManager
 import com.grappim.aipal.android.files.vosk.ModelRetriever
 import com.grappim.aipal.android.files.vosk.VoskModelCheck
-import com.grappim.aipal.android.recognition.android.AndroidSSTManager
-import com.grappim.aipal.android.recognition.android.SpeechRecognitionWrapper
-import com.grappim.aipal.android.recognition.android.SpeechRecognitionWrapperImpl
+import com.grappim.aipal.android.recognition.android.AndroidSttManager
+import com.grappim.aipal.android.recognition.android.AndroidSpeechRecognizerWrapper
+import com.grappim.aipal.android.recognition.android.AndroidSpeechRecognizerWrapperImpl
 import com.grappim.aipal.android.recognition.factory.AndroidSTTFactory
 import com.grappim.aipal.android.recognition.vosk.RecognitionMessageDecoder
 import com.grappim.aipal.android.recognition.vosk.RecognitionMessageDecoderImpl
@@ -19,15 +19,15 @@ import org.koin.dsl.module
 val recognizersModule =
     module {
 
-        single<SpeechRecognitionWrapper> {
+        single<AndroidSpeechRecognizerWrapper> {
             val context = get<Context>()
-            SpeechRecognitionWrapperImpl(context)
+            AndroidSpeechRecognizerWrapperImpl(context)
         }
 
         factory<RecognitionMessageDecoder> { RecognitionMessageDecoderImpl(get<Json>()) }
 
-        factory { AndroidSSTManager(get<SpeechRecognitionWrapper>(), get<LocalDataStorage>()) }
-        factory {
+        single { AndroidSttManager(get<AndroidSpeechRecognizerWrapper>(), get<LocalDataStorage>()) }
+        single {
             VoskSttManager(
                 get<RecognitionMessageDecoder>(),
                 get<LocalDataStorage>(),
@@ -39,12 +39,8 @@ val recognizersModule =
 
         single<STTFactory> {
             AndroidSTTFactory(
-                androidSSTManagerFactory = {
-                    get<AndroidSSTManager>()
-                },
-                voskSttManagerFactory = {
-                    get<VoskSttManager>()
-                }
+                get<AndroidSttManager>(),
+                get<VoskSttManager>()
             )
         }
     }

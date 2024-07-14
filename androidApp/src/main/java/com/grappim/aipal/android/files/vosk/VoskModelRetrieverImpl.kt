@@ -112,14 +112,6 @@ class VoskModelRetrieverImpl(
                     )
                 )
             )
-            _state.emit(
-                ModelRetrieverState(
-                    modelRetrievalResult = ModelRetrievalResult(
-                        supportedLanguage = supportedLanguage,
-                        modelRetrievalState = ModelRetrievalState.Initial
-                    )
-                )
-            )
 
             _state.emit(
                 ModelRetrieverState(

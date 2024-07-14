@@ -6,9 +6,9 @@ import android.speech.RecognitionListener
 import android.speech.SpeechRecognizer
 import androidx.annotation.MainThread
 
-class SpeechRecognitionWrapperImpl(
+class AndroidSpeechRecognizerWrapperImpl(
     private val context: Context,
-) : SpeechRecognitionWrapper {
+) : AndroidSpeechRecognizerWrapper {
     override val speechRecognizer: SpeechRecognizer =
         SpeechRecognizer.createSpeechRecognizer(context)
 
