@@ -28,7 +28,6 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -40,7 +39,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.grappim.aipal.android.feature.settings.ai.DynamicSelectTextField
 import com.grappim.aipal.data.recognition.CurrentSTTManager
 import com.grappim.aipal.data.recognition.ModelRetrievalState
 import com.grappim.aipal.widgets.PlatoAlertDialog
@@ -92,7 +90,6 @@ fun SttSettingsRoute(
                 .padding(horizontal = 16.dp)
                 .fillMaxWidth(),
         ) {
-            LanguageChooser(state)
             SstManagerChooser(state)
             VoskLanguageModelChooser(state)
         }
@@ -223,22 +220,6 @@ private fun VoskModelModelStateContent(ui: VoskModelUI) {
             }
         }
     }
-}
-
-@Composable
-private fun LanguageChooser(state: SttSettingsState) {
-    Text(
-        text = "Here you can choose the language (please also check the TTS " +
-                "language so that they would be the same one)"
-    )
-    Spacer(modifier = Modifier.height(6.dp))
-
-    DynamicSelectTextField(
-        selectedValue = state.currentLanguage.title,
-        options = state.languages,
-        label = "Language",
-        onValueChangedEvent = state.onSetCurrentLanguage,
-    )
 }
 
 @Composable

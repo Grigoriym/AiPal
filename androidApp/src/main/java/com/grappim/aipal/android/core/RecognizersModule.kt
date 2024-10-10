@@ -18,7 +18,6 @@ import org.koin.dsl.module
 
 val recognizersModule =
     module {
-
         single<AndroidSpeechRecognizerWrapper> {
             val context = get<Context>()
             AndroidSpeechRecognizerWrapperImpl(context)

@@ -89,7 +89,6 @@ import nl.marc_apps.tts.TextToSpeechEngine
 import nl.marc_apps.tts.rememberTextToSpeechOrNull
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ChatRoute(
     viewModel: ChatViewModel = koinViewModel(),

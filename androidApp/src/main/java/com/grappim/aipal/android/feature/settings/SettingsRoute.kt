@@ -28,6 +28,7 @@ fun SettingsRoute(
     goToApiKeysSettings: () -> Unit,
     goToAiSettings: () -> Unit,
     goToSstSettings: () -> Unit,
+    goToLanguageSettings: () -> Unit
 ) {
     val context = LocalContext.current
     val ttsIntent by remember { mutableStateOf(Intent("com.android.settings.TTS_SETTINGS")) }
@@ -42,10 +43,10 @@ fun SettingsRoute(
 
         Column(
             modifier =
-                Modifier
-                    .padding(paddingValues)
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+            Modifier
+                .padding(paddingValues)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
         ) {
             PlatoTextButton(text = "Setup TTS", onClick = { context.startActivity(ttsIntent) })
             PlatoTextButton(text = "Setup STT", onClick = goToSstSettings)
@@ -56,6 +57,7 @@ fun SettingsRoute(
 
             PlatoTextButton(text = "AI Settings", onClick = goToAiSettings)
             PlatoTextButton(text = "UI Settings", onClick = { state.onShowUiSettings(true) })
+            PlatoTextButton(text = "Language Settings", onClick = goToLanguageSettings)
         }
     }
 }

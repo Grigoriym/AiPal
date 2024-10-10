@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.sqldelight)
 }
 
 kotlin {
@@ -29,7 +30,7 @@ kotlin {
     ).forEach {
         it.binaries.framework {
             baseName = "Shared"
-            isStatic = true
+            isStatic = false
         }
     }
 
@@ -69,6 +70,9 @@ kotlin {
             // Temporarily added so that with ios the project can be built
             // https://github.com/cashapp/sqldelight/issues/4357#issuecomment-1839905700
             implementation(libs.stately.common)
+
+            implementation(libs.sqldelight.runtime)
+            implementation(libs.sqldelight.coroutines)
         }
 
         commonTest.dependencies {
@@ -78,6 +82,7 @@ kotlin {
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
             api(libs.permissions.compose)
+            implementation(libs.native.driver)
         }
 
         androidMain.dependencies {
@@ -87,12 +92,23 @@ kotlin {
 
             implementation(libs.ktor.client.okhttp)
             api(libs.permissions.compose)
+
+            implementation(libs.android.driver)
         }
 
         val desktopMain by getting
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
+        }
+    }
+}
+
+// ./gradlew generateCommonMainAipalDbInterface
+sqldelight {
+    databases {
+        create("AipalDb") {
+            packageName.set("com.grappim.aipal")
         }
     }
 }

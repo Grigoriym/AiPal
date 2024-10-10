@@ -1,0 +1,125 @@
+CREATE TABLE Languages (
+    id INTEGER PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    lngCode TEXT NOT NULL
+);
+
+CREATE TABLE Prompts (
+    id INTEGER PRIMARY KEY NOT NULL ,
+    content TEXT NOT NULL,
+    languageId INTEGER NOT NULL,
+    type TEXT NOT NULL,
+    FOREIGN KEY (languageId) REFERENCES Languages(id) ON DELETE CASCADE
+);
+
+-- Insert Queries
+
+insertLanguage:
+INSERT INTO Languages(id, name, lngCode)
+VALUES(?, ?, ?);
+
+insertPrompt:
+INSERT INTO Prompts(id, content, languageId, type)
+VALUES(?, ?, ?, ?);
+
+-- Update Queries
+
+updateLanguage:
+UPDATE Languages
+SET name = ?, lngCode = ?
+WHERE id = ?;
+
+updatePrompt:
+UPDATE Prompts
+SET content = ?, languageId = ?, type = ?
+WHERE id = ?;
+
+updatePromptByType:
+UPDATE Prompts
+SET content = ?, languageId = ?
+WHERE type = ?;
+
+-- Delete Queries
+
+removeAllLanguages:
+DELETE FROM Languages;
+
+removeLanguageById:
+DELETE FROM Languages
+WHERE id = ?;
+
+removePromptById:
+DELETE FROM Prompts
+WHERE id = ?;
+
+removePromptsByLanguageId:
+DELETE FROM Prompts
+WHERE languageId = ?;
+
+-- Select Queries
+
+getAllLanguages:
+SELECT * FROM Languages;
+
+getLanguageById:
+SELECT * FROM Languages WHERE id = ?;
+
+getAllPrompts:
+SELECT * FROM Prompts;
+
+getPromptById:
+SELECT * FROM Prompts WHERE id = ?;
+
+getPromptsByLanguageId:
+SELECT * FROM Prompts
+WHERE languageId = ?;
+
+getPromptBYLanguageAndType:
+SELECT * FROM Prompts
+WHERE languageId = ? AND type = ?;
+
+-- Retrieve languageId by lngCode
+getLanguageIdByLngCode:
+SELECT id FROM Languages
+WHERE lngCode = ?;
+
+-- Retrieve prompts by lngCode
+getPromptsByLngCode:
+SELECT Prompts.*
+FROM Prompts
+JOIN Languages ON Prompts.languageId = Languages.id
+WHERE Languages.lngCode = ?;
+
+-- Join Queries
+
+getPromptsWithLanguage:
+SELECT Prompts.*, Languages.name, Languages.lngCode
+FROM Prompts
+JOIN Languages ON Prompts.languageId = Languages.id;
+
+getPromptWithLanguageById:
+SELECT Prompts.*, Languages.name, Languages.lngCode
+FROM Prompts
+JOIN Languages ON Prompts.languageId = Languages.id
+WHERE Prompts.id = ?;
+
+-- Pre populate
+
+insertInitialLanguages:
+INSERT INTO Languages(id, name, lngCode)
+VALUES
+    (1, 'English', 'en'),
+    (2, 'German', 'de');
+
+-- Prepopulate prompts
+insertInitialPrompts:
+INSERT INTO Prompts(id, content, languageId, type)
+VALUES
+    (1, 'You are my English friend with whom I want to practice English. When I finish this conversation, show me my errors and provide ways to fix them.', 1, 'behavior'),
+    (2, 'Translate the next message to German, give me only the translation and nothing else', 1, 'translation'),
+    (3, 'Check the next message for any types of errors, and provide me only the correct answer and nothing else. If the sentence is fine just send me that sentence that I have provided', 1, 'spelling'),
+    (4, 'Please answer me without special symbols, like *, because otherwise the TTS engine will also pronounce those special symbols.', 1, 'ai_fix'),
+    (5, 'You are my German friend with whom I want to practice German. When I finish this conversation, show me my errors and provide ways to fix them.', 2, 'behavior'),
+    (6, 'Translate the next message to English, give me only the translation and nothing else', 2, 'translation'),
+    (7, 'Check the next message for any types of errors, and provide me only the correct answer and nothing else. If the sentence is fine just send me that sentence that I have provided', 2, 'spelling'),
+    (8, 'Please answer me without special symbols, like *, because otherwise the TTS engine will also pronounce those special symbols.', 2, 'ai_fix');

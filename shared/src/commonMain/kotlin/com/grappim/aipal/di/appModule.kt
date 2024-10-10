@@ -2,10 +2,13 @@ package com.grappim.aipal.di
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import com.grappim.aipal.cache.DatabaseDriverFactory
 import com.grappim.aipal.data.local.LocalDataStorage
 import com.grappim.aipal.data.local.LocalDataStorageImpl
 import com.grappim.aipal.data.repo.AiPalRepo
 import com.grappim.aipal.data.repo.AiPalRepoImpl
+import com.grappim.aipal.data.repo.DbRepo
+import com.grappim.aipal.data.repo.DbRepoImpl
 import com.grappim.aipal.data.uuid.UuidGenerator
 import com.grappim.aipal.data.uuid.UuidGeneratorImpl
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -26,7 +29,13 @@ fun repoModule() = module {
     single<AiPalRepo> {
         AiPalRepoImpl(
             localDataStorage = get<LocalDataStorage>(),
-            uuidGenerator = get<UuidGenerator>()
+            uuidGenerator = get<UuidGenerator>(),
+            dbRepo = get<DbRepo>()
+        )
+    }
+    single<DbRepo> {
+        DbRepoImpl(
+            databaseDriverFactory = get<DatabaseDriverFactory>()
         )
     }
 }
