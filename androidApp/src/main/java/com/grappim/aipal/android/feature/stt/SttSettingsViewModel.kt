@@ -39,8 +39,6 @@ class SttSettingsViewModel(
                 onSttManagerChange = ::onSttChange,
                 description = CurrentSTTManager.default().description,
                 currentLanguage = SupportedLanguage.getDefault(),
-                onSetCurrentLanguage = ::setLanguage,
-                languages = SupportedLanguage.entries.map { it.name }.toSet(),
                 onModelDownload = ::downloadModel,
                 onDismissDialog = ::dismissDialog,
                 acknowledgeError = ::acknowledgeError
@@ -62,7 +60,6 @@ class SttSettingsViewModel(
             launch {
                 localDataStorage.currentLanguage.distinctUntilChanged().collect { lng ->
                     _state.update { it.copy(currentLanguage = lng) }
-                    sttManager.changeLanguage(lng)
                 }
             }
         }
@@ -139,13 +136,6 @@ class SttSettingsViewModel(
     private fun onSttChange(currentSTTManager: CurrentSTTManager) {
         viewModelScope.launch {
             localDataStorage.setSttManager(currentSTTManager)
-        }
-    }
-
-    private fun setLanguage(supportedLanguage: String) {
-        viewModelScope.launch {
-            val enum = SupportedLanguage.valueOf(supportedLanguage)
-            localDataStorage.setCurrentLanguage(enum)
         }
     }
 }

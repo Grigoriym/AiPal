@@ -10,14 +10,9 @@ interface LocalDataStorage {
     val currentGptModel: Flow<String>
     val gptModels: Flow<Set<String>>
     val darkThemeConfig: Flow<DarkThemeConfig>
-    val translationPrompt: Flow<String>
-    val behavior: Flow<String>
     val openAiApiKey: Flow<String>
     val currentLanguage: Flow<SupportedLanguage>
     val sttManager: Flow<CurrentSTTManager>
-    val spellingPrompt: Flow<String>
-    val aiAnswerFixPrompt: Flow<String>
-
     suspend fun setCurrentGptModel(model: String)
 
     suspend fun setTemperature(temp: Double)
@@ -26,14 +21,8 @@ interface LocalDataStorage {
 
     suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig)
 
-    suspend fun setTranslationPrompt(prompt: String)
-
-    suspend fun setBehavior(text: String)
-
     suspend fun setOpenAiApiKey(key: String)
 
     suspend fun setCurrentLanguage(language: SupportedLanguage)
     suspend fun setSttManager(sstManager: CurrentSTTManager)
-    suspend fun setSpellingPrompt(prompt: String)
-    suspend fun setAiAnswerFixPrompt(prompt: String)
 }

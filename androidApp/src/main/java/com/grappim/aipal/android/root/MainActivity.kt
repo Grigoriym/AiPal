@@ -16,7 +16,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.grappim.aipal.android.feature.chat.ChatRoute
-import com.grappim.aipal.android.feature.prompts.PromptsRoute
 import com.grappim.aipal.android.feature.settings.SettingsRoute
 import com.grappim.aipal.android.feature.settings.ai.AiSettingsRoute
 import com.grappim.aipal.android.feature.settings.apiKeys.GptSettingsRoute
@@ -24,7 +23,10 @@ import com.grappim.aipal.android.feature.stt.SttSettingsRoute
 import com.grappim.aipal.core.nav.NavDestinations
 import com.grappim.aipal.data.model.DarkThemeConfig
 import com.grappim.aipal.feature.main.MainState
+import com.grappim.aipal.feature.prompts.PromptsRoute
+import com.grappim.aipal.feature.settings.language.LanguageRoute
 import com.grappim.aipal.uikit.AiPalTheme
+import org.koin.androidx.compose.koinViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
@@ -70,10 +72,13 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate(NavDestinations.AiSettings.route)
                             }, goToSstSettings = {
                                 navController.navigate(NavDestinations.SttSettings.route)
+                            }, goToLanguageSettings = {
+                                navController.navigate(NavDestinations.LanguageSettings.route)
                             })
                         }
                         composable(NavDestinations.Prompts.route) {
                             PromptsRoute(
+                                viewModel = koinViewModel(),
                                 onBack = {
                                     navController.popBackStack()
                                 }
@@ -95,6 +100,13 @@ class MainActivity : ComponentActivity() {
                                     navController.popBackStack()
                                 }
                             )
+                        }
+                        composable(NavDestinations.LanguageSettings.route) {
+                            LanguageRoute(
+                                viewModel = koinViewModel(),
+                                onBack = {
+                                    navController.popBackStack()
+                                })
                         }
                     }
                 }

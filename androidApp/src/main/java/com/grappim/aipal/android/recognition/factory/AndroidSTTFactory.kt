@@ -14,19 +14,23 @@ class AndroidSTTFactory(
 
     private val logging = logging()
 
-    private var current: STTManager? = null
+    private var currentSTT: STTManager? = null
 
     override fun getSSTManager(currentSTTManager: CurrentSTTManager): STTManager {
         logging.d { "Now you have chosen: $currentSTTManager" }
 
-        current?.cleanup()
-        val current = when (currentSTTManager) {
+        val newSTT = when (currentSTTManager) {
             CurrentSTTManager.Android -> androidSttManager
             CurrentSTTManager.Vosk -> voskSttManager
         }
-        current.initialize()
 
-        logging.d { "Now you are using: $current" }
-        return current
+        if (currentSTT != newSTT) {
+            currentSTT?.cleanup()
+            currentSTT = newSTT
+            currentSTT?.initialize()
+        }
+
+        logging.d { "Now you are using: $currentSTT" }
+        return requireNotNull(currentSTT)
     }
 }

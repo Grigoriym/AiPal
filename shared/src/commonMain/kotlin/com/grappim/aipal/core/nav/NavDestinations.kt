@@ -26,4 +26,8 @@ sealed interface NavDestinations {
     data object SttSettings : NavDestinations {
         override val route: String = "stt_settings_route"
     }
+
+    data object LanguageSettings : NavDestinations {
+        override val route: String = "language_settings_route"
+    }
 }

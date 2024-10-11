@@ -108,4 +108,6 @@ dependencies {
     implementation(libs.androidx.datastore.prefs)
 
     implementation(libs.kotlinx.datetime)
+
+    implementation(libs.android.driver)
 }

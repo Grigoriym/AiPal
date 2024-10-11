@@ -9,6 +9,7 @@ import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.LoggingConfig
 import com.aallam.openai.client.OpenAI
 import com.aallam.openai.client.RetryStrategy
+import com.grappim.aipal.data.db.model.PromptType
 import com.grappim.aipal.data.exceptions.OpenAiEmptyApiKeyException
 import com.grappim.aipal.data.local.LocalDataStorage
 import com.grappim.aipal.data.model.Message
@@ -30,7 +31,8 @@ import kotlin.time.Duration.Companion.seconds
 
 class AiPalRepoImpl(
     private val localDataStorage: LocalDataStorage,
-    private val uuidGenerator: UuidGenerator
+    private val uuidGenerator: UuidGenerator,
+    private val dbRepo: DbRepo
 ) : AiPalRepo {
 
     private val job = SupervisorJob()
@@ -68,18 +70,18 @@ class AiPalRepoImpl(
                 }
             }
             launch {
-                localDataStorage.behavior.collect { value ->
+                dbRepo.behaviorPromptFlow.collect { prompt ->
                     updateOrAddSystemMessage(
                         messageType = MessageType.BEHAVIOR,
-                        newText = value
+                        newText = prompt.content
                     )
                 }
             }
             launch {
-                localDataStorage.aiAnswerFixPrompt.collect { value ->
+                dbRepo.aiAnswerFixPromptFlow.collect { prompt ->
                     updateOrAddSystemMessage(
                         messageType = MessageType.AI_FIX,
-                        newText = value
+                        newText = prompt.content
                     )
                 }
             }
@@ -115,12 +117,16 @@ class AiPalRepoImpl(
         withContext(Dispatchers.Default) {
             try {
                 val service = getOpenAi()
+                val spellingPrompt = dbRepo.getPrompt(
+                    languageId = localDataStorage.currentLanguage.first().dbId,
+                    type = PromptType.SPELLING
+                )
                 val chatCompletionRequest =
                     createChatCompletionRequest(
                         listOf(
                             ChatMessage(
                                 role = Role.System,
-                                content = localDataStorage.spellingPrompt.first(),
+                                content = spellingPrompt.content,
                             ),
                             ChatMessage(
                                 role = Role.User,
@@ -146,12 +152,16 @@ class AiPalRepoImpl(
         withContext(Dispatchers.Default) {
             try {
                 val service = getOpenAi()
+                val translationPrompt = dbRepo.getPrompt(
+                    languageId = localDataStorage.currentLanguage.first().dbId,
+                    type = PromptType.TRANSLATION
+                )
                 val chatCompletionRequest =
                     createChatCompletionRequest(
                         listOf(
                             ChatMessage(
                                 role = Role.System,
-                                content = localDataStorage.translationPrompt.first(),
+                                content = translationPrompt.content,
                             ),
                             ChatMessage(
                                 role = Role.User,

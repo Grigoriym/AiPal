@@ -16,20 +16,20 @@ class DesktopLocalDataStorage : LocalDataStorage {
         get() = flow { }
     override val darkThemeConfig: Flow<DarkThemeConfig>
         get() = flow { }
-    override val translationPrompt: Flow<String>
-        get() = flow { }
-    override val behavior: Flow<String>
-        get() = flow { }
+//    override val translationPrompt: Flow<String>
+//        get() = flow { }
+//    override val behavior: Flow<String>
+//        get() = flow { }
     override val openAiApiKey: Flow<String>
         get() = flow { }
     override val currentLanguage: Flow<SupportedLanguage>
         get() = flow { }
     override val sttManager: Flow<CurrentSTTManager>
         get() = flow { }
-    override val spellingPrompt: Flow<String>
-        get() = flow { }
-    override val aiAnswerFixPrompt: Flow<String>
-        get() = flow { }
+//    override val spellingPrompt: Flow<String>
+//        get() = flow { }
+//    override val aiAnswerFixPrompt: Flow<String>
+//        get() = flow { }
 
     override suspend fun setCurrentGptModel(model: String) {
         TODO("Not yet implemented")
@@ -47,13 +47,13 @@ class DesktopLocalDataStorage : LocalDataStorage {
         TODO("Not yet implemented")
     }
 
-    override suspend fun setTranslationPrompt(prompt: String) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun setBehavior(text: String) {
-        TODO("Not yet implemented")
-    }
+//    override suspend fun setTranslationPrompt(prompt: String) {
+//        TODO("Not yet implemented")
+//    }
+//
+//    override suspend fun setBehavior(text: String) {
+//        TODO("Not yet implemented")
+//    }
 
     override suspend fun setOpenAiApiKey(key: String) {
         TODO("Not yet implemented")
@@ -67,11 +67,11 @@ class DesktopLocalDataStorage : LocalDataStorage {
         TODO("Not yet implemented")
     }
 
-    override suspend fun setSpellingPrompt(prompt: String) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun setAiAnswerFixPrompt(prompt: String) {
-        TODO("Not yet implemented")
-    }
+//    override suspend fun setSpellingPrompt(prompt: String) {
+//        TODO("Not yet implemented")
+//    }
+//
+//    override suspend fun setAiAnswerFixPrompt(prompt: String) {
+//        TODO("Not yet implemented")
+//    }
 }

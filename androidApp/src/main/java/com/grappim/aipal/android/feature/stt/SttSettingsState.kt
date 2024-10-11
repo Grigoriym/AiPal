@@ -11,8 +11,6 @@ data class SttSettingsState(
     val onSttManagerChange: (CurrentSTTManager) -> Unit,
     val description: String = "",
     val currentLanguage: SupportedLanguage,
-    val onSetCurrentLanguage: (String) -> Unit,
-    val languages: Set<String>,
     val availableModels: List<VoskModelUI> = emptyList(),
     val onModelDownload: (VoskModelAvailability) -> Unit,
     val isDownloading: Boolean = false,

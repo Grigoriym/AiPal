@@ -6,12 +6,8 @@ import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
-import com.grappim.aipal.core.DEFAULT_AI_ANSWER_FIX_PROMPT
-import com.grappim.aipal.core.DEFAULT_BEHAVIOR
 import com.grappim.aipal.core.DEFAULT_MODEL
-import com.grappim.aipal.core.DEFAULT_SPELLING_CHECK_PROMPT
 import com.grappim.aipal.core.DEFAULT_TEMPERATURE
-import com.grappim.aipal.core.DEFAULT_TRANSLATION_PROMPT
 import com.grappim.aipal.core.SupportedLanguage
 import com.grappim.aipal.data.model.DarkThemeConfig
 import com.grappim.aipal.data.recognition.CurrentSTTManager
@@ -29,13 +25,6 @@ class LocalDataStorageImpl(
         dataStore.data
             .map { value: Preferences ->
                 value[tempKey] ?: DEFAULT_TEMPERATURE
-            }
-
-    private val aiAnswerFixPromptKey = stringPreferencesKey("ai_answer_fix_prompt_key")
-    override val aiAnswerFixPrompt: Flow<String> =
-        dataStore.data
-            .map { value: Preferences ->
-                value[aiAnswerFixPromptKey] ?: DEFAULT_AI_ANSWER_FIX_PROMPT
             }
 
     private val sstManagerKey = stringPreferencesKey("sst_manager_key")
@@ -59,24 +48,6 @@ class LocalDataStorageImpl(
             .map { value ->
                 value[openAiApiKeyKey] ?: ""
             }
-
-    private val translationPromptKey = stringPreferencesKey("translation_prompt_key")
-    override val translationPrompt: Flow<String> =
-        dataStore.data.map { value ->
-            value[translationPromptKey] ?: DEFAULT_TRANSLATION_PROMPT
-        }
-
-    private val spellingPromptKey = stringPreferencesKey("spelling_prompt_key")
-    override val spellingPrompt: Flow<String> =
-        dataStore.data.map { value ->
-            value[spellingPromptKey] ?: DEFAULT_SPELLING_CHECK_PROMPT
-        }
-
-    private val behaviorKey = stringPreferencesKey("behavior_key")
-    override val behavior: Flow<String> =
-        dataStore.data.map { value ->
-            value[behaviorKey] ?: DEFAULT_BEHAVIOR
-        }
 
     private val currentGptModelKey = stringPreferencesKey("current_gpt_key")
     override val currentGptModel: Flow<String> =
@@ -122,18 +93,6 @@ class LocalDataStorageImpl(
         }
     }
 
-    override suspend fun setTranslationPrompt(prompt: String) {
-        dataStore.edit { settings ->
-            settings[translationPromptKey] = prompt
-        }
-    }
-
-    override suspend fun setBehavior(text: String) {
-        dataStore.edit { settings ->
-            settings[behaviorKey] = text
-        }
-    }
-
     override suspend fun setOpenAiApiKey(key: String) {
         dataStore.edit { settings ->
             settings[openAiApiKeyKey] = key
@@ -149,18 +108,6 @@ class LocalDataStorageImpl(
     override suspend fun setSttManager(sstManager: CurrentSTTManager) {
         dataStore.edit { settings ->
             settings[sstManagerKey] = sstManager.name
-        }
-    }
-
-    override suspend fun setSpellingPrompt(prompt: String) {
-        dataStore.edit { settings ->
-            settings[spellingPromptKey] = prompt
-        }
-    }
-
-    override suspend fun setAiAnswerFixPrompt(prompt: String) {
-        dataStore.edit { settings ->
-            settings[aiAnswerFixPromptKey] = prompt
         }
     }
 }
