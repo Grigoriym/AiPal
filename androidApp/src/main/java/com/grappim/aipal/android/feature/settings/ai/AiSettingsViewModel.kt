@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.lighthousegames.logging.logging
+import java.util.Locale
 
 class AiSettingsViewModel(
     private val localDataStorage: LocalDataStorage,
@@ -51,7 +52,7 @@ class AiSettingsViewModel(
 
     private fun setTemp(newTemp: Double) {
         logging.d { "newTemp: $newTemp" }
-        val formattedTemp = "%.1f".format(newTemp)
+        val formattedTemp = "%.1f".format(Locale.US, newTemp)
         _state.update { it.copy(tempValue = formattedTemp.toDouble()) }
     }
 
